@@ -1,0 +1,179 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --app-bg: #f8fafc;
+  --app-surface: #ffffff;
+  --app-text-primary: #0f172a;
+  --app-text-secondary: #64748b;
+  --app-border: #e2e8f0;
+  --app-accent: #6366f1;
+  --app-accent-hover: #4f46e5;
+  --app-gradient: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+  --app-glass: rgba(255, 255, 255, 0.75);
+  --app-glass-border: rgba(255, 255, 255, 0.3);
+  --app-shadow: 0 4px 20px -1px rgba(0, 0, 0, 0.05);
+}
+
+.dark {
+  --app-bg: #020617;
+  --app-surface: #0f172a;
+  --app-text-primary: #f8fafc;
+  --app-text-secondary: #94a3b8;
+  --app-border: rgba(255, 255, 255, 0.08);
+  --app-accent: #818cf8;
+  --app-accent-hover: #6366f1;
+  --app-gradient: linear-gradient(135deg, #818cf8 0%, #c084fc 100%);
+  --app-glass: rgba(15, 23, 42, 0.85);
+  --app-glass-border: rgba(255, 255, 255, 0.1);
+  --app-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.5);
+}
+
+body {
+  font-family: 'Outfit', 'Inter', sans-serif;
+  background-color: var(--app-bg);
+  color: var(--app-text-primary);
+  margin: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition: background-color 0.4s cubic-bezier(0.4, 0, 0.2, 1), color 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  min-height: 100vh;
+}
+
+/* Base Text Visibility Utilities */
+.text-main { color: var(--app-text-primary); }
+.text-sub { color: var(--app-text-secondary); }
+
+/* Premium Component Base Classes */
+.premium-card {
+  background-color: var(--app-surface);
+  border: 1px solid var(--app-border);
+  border-radius: 24px;
+  box-shadow: var(--app-shadow);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.premium-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.15);
+}
+
+.dark .premium-card:hover {
+  box-shadow: 0 20px 60px -12px rgba(0, 0, 0, 0.6);
+}
+
+.glass-morphism {
+  background: var(--app-glass);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--app-glass-border);
+}
+
+.accent-gradient-text {
+  background: var(--app-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  display: inline-block;
+}
+
+.accent-gradient-bg {
+  background: var(--app-gradient);
+  color: white;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(15px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.animate-scale-in {
+  animation: scaleIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.premium-button {
+  @apply px-8 py-3 rounded-2xl font-bold transition-all duration-300 active:scale-95 flex items-center justify-center gap-2;
+  background: var(--app-gradient);
+  color: white;
+  box-shadow: 0 8px 16px -4px rgba(99, 102, 241, 0.4);
+}
+
+.premium-button:hover {
+  opacity: 0.95;
+  transform: translateY(-1px);
+  box-shadow: 0 12px 24px -6px rgba(99, 102, 241, 0.5);
+}
+
+.premium-input {
+  @apply w-full bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-white/10 rounded-2xl px-5 py-4 outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all text-[15px] font-medium;
+  color: var(--app-text-primary);
+}
+
+/* Grid Layouts - Highly Responsive */
+.feed-grid {
+  display: flex;
+  gap: 2.5rem;
+  max-width: 1280px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.feed-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.feed-side {
+  width: 380px;
+  flex-shrink: 0;
+}
+
+@media (max-width: 1100px) {
+  .feed-side {
+    width: 320px;
+  }
+}
+
+@media (max-width: 900px) {
+  .feed-grid {
+    flex-direction: column;
+  }
+  .feed-side {
+    width: 100%;
+    margin-top: 2rem;
+  }
+}
+
+/* Utility */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.modal-backdrop {
+  @apply fixed inset-0 z-[100] bg-slate-900/40 dark:bg-black/60 backdrop-blur-md flex items-center justify-center;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}

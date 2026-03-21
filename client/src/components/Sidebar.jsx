@@ -1,0 +1,131 @@
+import React, { useState } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+import {
+  Home, Compass, MessageSquare, Calendar, Users, Activity, User, LogOut, 
+  Settings, Bookmark, Menu, Plus, Zap, ChevronRight
+} from 'lucide-react';
+import ThemeToggle from './ui/ThemeToggle';
+
+const Sidebar = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { user, logout } = useAuth();
+  const [showMore, setShowMore] = useState(false);
+
+  const menuItems = [
+    { icon: Home,          label: 'Feed',          path: '/dashboard' },
+    { icon: Compass,       label: 'Discovery',     path: '/explore' },
+    { icon: MessageSquare, label: 'Messages',      path: '/chats', hasNew: true },
+    { icon: Calendar,      label: 'Experiences',   path: '/events' },
+    { icon: Users,         label: 'Societies',     path: '/study-groups' },
+    { icon: Activity,      label: 'Analytics',     path: '/notifications' },
+    { icon: User,          label: 'Identity',      path: '/profile' },
+  ];
+
+  const isActive = (path) => {
+    const base = path.split('?')[0];
+    return location.pathname === base;
+  };
+
+  return (
+    <div className="fixed left-0 top-0 bottom-0 w-[85px] xl:w-[280px] bg-white dark:bg-slate-950 border-r border-slate-200 dark:border-white/5 p-4 xl:p-8 flex flex-col z-[100] transition-all duration-300 overflow-y-auto no-scrollbar">
+      {/* Premium Campus Logo */}
+      <div className="py-10 px-4 mb-2 select-none cursor-pointer flex items-center gap-3 group" onClick={() => navigate('/dashboard')}>
+        <div className="w-10 h-10 accent-gradient-bg rounded-xl flex items-center justify-center text-white shadow-lg shadow-indigo-500/20 group-hover:rotate-12 transition-transform duration-300">
+           <Zap size={22} fill="white" />
+        </div>
+        <h1 className="text-2xl font-black xl:block hidden text-slate-900 dark:text-white uppercase tracking-tighter">
+           Campus <span className="accent-gradient-text">Hub</span>
+        </h1>
+      </div>
+      
+      {/* Navigation Space */}
+      <nav className="flex-1 flex flex-col gap-2">
+        {menuItems.map(item => (
+          <button
+            key={item.label}
+            onClick={() => navigate(item.path)}
+            className={`w-full flex items-center gap-5 px-5 py-4 rounded-2xl transition-all duration-300 group/item relative overflow-hidden ${
+              isActive(item.path) 
+              ? 'text-indigo-600 dark:text-indigo-400 bg-indigo-500/5 dark:bg-indigo-500/10' 
+              : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-white/5'
+            }`}
+          >
+            {/* Active Indicator Bar */}
+            {isActive(item.path) && (
+               <div className="absolute left-0 top-1/4 bottom-1/4 w-1 accent-gradient-bg rounded-r-full shadow-lg"></div>
+            )}
+
+            <div className="relative z-10">
+               <item.icon size={24} className={`transition-all duration-300 ${isActive(item.path) ? 'scale-110' : 'group-hover/item:scale-110 group-hover/item:rotate-3'}`} strokeWidth={isActive(item.path) ? 2.5 : 2} />
+               {item.hasNew && (
+                  <div className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-rose-500 border-2 border-white dark:border-slate-950 rounded-full animate-pulse"></div>
+               )}
+            </div>
+            
+            <span className={`text-[15px] hidden xl:block z-10 uppercase tracking-widest font-bold ${isActive(item.path) ? 'opacity-100' : 'opacity-80 group-hover/item:opacity-100'}`}>
+               {item.label}
+            </span>
+
+            {/* Subtle Hover Glow */}
+            <div className="absolute inset-0 bg-gradient-to-r from-indigo-500/0 to-indigo-500/0 group-hover/item:from-indigo-500/5 transition-all"></div>
+          </button>
+        ))}
+
+        <div className="mt-8 pt-8 border-t border-slate-200 dark:border-white/5 px-4 hidden xl:block">
+           <p className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.3em] mb-4">Operations</p>
+           <button 
+             onClick={() => navigate('/dashboard?create=true')}
+             className="w-full py-4 accent-gradient-bg rounded-2xl text-white text-xs font-bold uppercase tracking-widest shadow-xl shadow-indigo-500/20 hover:scale-[1.03] active:scale-95 transition-all flex items-center justify-center gap-3"
+           >
+              <Plus size={18} strokeWidth={3} /> Publish Update
+           </button>
+        </div>
+      </nav>
+
+      {/* Profile/Identity Section */}
+      <div className="relative mt-auto">
+        {showMore && (
+           <div className="absolute bottom-full left-0 w-full mb-6 bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-3xl shadow-3xl overflow-hidden animate-fade-in z-[110] backdrop-blur-xl">
+              <div className="p-3 space-y-1">
+                 {[
+                   { icon: Settings, label: 'Control Center', path: '/settings' },
+                   { icon: Bookmark, label: 'Archived Files', path: '/profile' }
+                 ].map(i => (
+                   <button key={i.label} className="w-full flex items-center justify-between p-4 text-[13px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 hover:text-indigo-500 hover:bg-slate-50 dark:hover:bg-white/5 rounded-2xl transition-all">
+                      <div className="flex items-center gap-4">
+                         <i.icon size={18} /> {i.label}
+                      </div>
+                      <ChevronRight size={14} />
+                   </button>
+                 ))}
+                 <div className="h-[1px] bg-slate-100 dark:bg-white/5 my-3 mx-2"></div>
+                 <ThemeToggle className="hover:bg-slate-50 dark:hover:bg-white/5 rounded-2xl" />
+                 <div className="h-[1px] bg-slate-100 dark:bg-white/5 my-3 mx-2"></div>
+                 <button onClick={logout} className="w-full flex items-center gap-4 p-4 text-[13px] text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-500/10 rounded-2xl transition-all font-bold uppercase tracking-wider">
+                    <LogOut size={18} /> Terminate Session
+                 </button>
+              </div>
+           </div>
+        )}
+
+        <button 
+          onClick={() => setShowMore(!showMore)}
+          className={`w-full flex items-center gap-4 p-4 rounded-2xl transition-all duration-300 ${showMore ? 'bg-slate-100 dark:bg-white/5 shadow-inner' : 'hover:bg-slate-50 dark:hover:bg-white/5'}`}
+        >
+          <div className="w-10 h-10 rounded-xl overflow-hidden shadow-lg border-2 border-transparent group-hover:border-indigo-500/50 transition-all shrink-0">
+             {user?.profilePic ? <img src={user.profilePic} className="w-full h-full object-cover" /> : <div className="w-full h-full bg-indigo-500 flex items-center justify-center text-white font-bold">{user?.firstName?.[0]}</div>}
+          </div>
+          <div className="hidden xl:flex flex-col items-start overflow-hidden">
+             <span className="text-[14px] font-bold text-slate-900 dark:text-white truncate w-full">{user?.firstName} {user?.lastName}</span>
+             <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{user?.role || 'Active Student'}</span>
+          </div>
+          <Menu size={20} className={`ml-auto hidden xl:block transition-all ${showMore ? 'rotate-90 text-indigo-500' : 'text-slate-400'}`} />
+        </button>
+      </div>
+    </div>
+  );
+};
+
+export default Sidebar;
