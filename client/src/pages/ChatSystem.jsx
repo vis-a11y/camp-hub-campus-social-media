@@ -10,7 +10,7 @@ import axios from 'axios';
 import toast from 'react-hot-toast';
 import { useLocation } from 'react-router-dom';
 
-const socket = io('http://localhost:5001', { autoConnect: false });
+const socket = io(import.meta.env.VITE_SOCKET_URL || 'http://localhost:5001', { autoConnect: false });
 
 const ChatSystem = () => {
   const { user } = useAuth();
