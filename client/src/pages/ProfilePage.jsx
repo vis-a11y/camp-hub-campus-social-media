@@ -59,7 +59,7 @@ const ProfilePage = () => {
         website: data.website || '',
         branch: data.branch || ''
       });
-      setIsFollowing(data.followers?.includes(currentUser?._id));
+      setIsFollowing(data.followers?.some((follower) => (follower?._id || follower)?.toString() === currentUser?._id));
       
       const { data: userPosts } = await axios.get(`/api/academic/posts/user/${profileId}`);
       setPosts(userPosts);
@@ -115,7 +115,7 @@ const ProfilePage = () => {
     const prevFollowing = isFollowing;
     setIsFollowing(!isFollowing);
     try {
-      await axios.post(`/api/auth/users/${user._id}/follow`);
+      await axios.put(`/api/auth/users/${user._id}/follow`);
     } catch {
       setIsFollowing(prevFollowing);
       toast.error('Action failed');

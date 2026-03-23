@@ -116,7 +116,7 @@ const Dashboard = () => {
 
   const handleFollow = async (id) => {
     try {
-      await axios.post(`/api/auth/users/${id}/follow`);
+      await axios.put(`/api/auth/users/${id}/follow`);
       toast.success('Following');
       setSuggestions(suggestions.filter(s => s._id !== id));
     } catch {

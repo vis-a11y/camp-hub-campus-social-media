@@ -20,14 +20,17 @@ const RegisterPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    const success = await register(formData);
-    if (success) {
-      toast.success('Identity Established - Welcome to the Hub');
-      navigate('/dashboard');
-    } else {
-      toast.error('Registration Synchronicity Failed');
+    try {
+      const success = await register(formData);
+      if (success) {
+        toast.success('Identity Established - Welcome to the Hub');
+        navigate('/dashboard');
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Registration Synchronicity Failed');
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   return (

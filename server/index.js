@@ -43,9 +43,21 @@ app.post('/api/upload', upload.single('file'), (req, res) => {
   res.json({ url, filename: req.file.filename });
 });
 
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/campchat')
+const mongoURI = process.env.MONGODB_URI;
+console.log('📡 Attempting to connect to MongoDB...');
+
+if (!mongoURI) {
+  console.warn('⚠️ Warning: MONGODB_URI is not defined. Falling back to localhost (fails on Railway).');
+}
+
+mongoose.connect(mongoURI || 'mongodb://localhost:27017/campchat')
   .then(() => console.log('✅ Connected to MongoDB'))
-  .catch((err) => console.error('❌ MongoDB Connection Error:', err));
+  .catch((err) => {
+    console.error('❌ MongoDB Connection Error:', err.message);
+    if (!mongoURI) {
+      console.error('💡 TIP: You are trying to connect to localhost on Railway. Set your MONGODB_URI in the Railway dashboard variables.');
+    }
+  });
 
 // Routes
 const authRoutes = require('./routes/authRoutes');
@@ -65,6 +77,11 @@ io.on('connection', (socket) => {
   console.log('Connected to socket.io');
 
   socket.on('setup', (userData) => {
+    if (!userData?._id) {
+      return;
+    }
+
+    socket.userId = userData._id.toString();
     socket.join(userData._id);
     console.log('User setup:', userData._id);
     socket.emit('connected');
@@ -88,9 +105,11 @@ io.on('connection', (socket) => {
     });
   });
 
-  socket.off('setup', () => {
+  socket.on('disconnect', () => {
     console.log('USER DISCONNECTED');
-    socket.leave(userData._id);
+    if (socket.userId) {
+      socket.leave(socket.userId);
+    }
   });
 });
 

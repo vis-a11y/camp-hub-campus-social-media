@@ -1,14 +1,17 @@
 const Event = require('../models/Event');
 
 const createEvent = async (req, res) => {
-  const { title, description, date, location, capacity, tags } = req.body;
+  const { title, description, date, time, location, image, type, capacity, tags } = req.body;
 
   try {
     const event = await Event.create({
       title,
       description,
       date,
+      time: time || '',
       location,
+      image: image || '',
+      type: type || 'Academic Hub',
       organizer: req.user._id,
       capacity: capacity || 0,
       tags: tags || [],

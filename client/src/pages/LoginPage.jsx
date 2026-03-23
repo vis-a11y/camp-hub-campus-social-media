@@ -13,14 +13,17 @@ const LoginPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    const success = await login(formData.email, formData.password);
-    if (success) {
-      toast.success('Access Granted - Synchronizing Session');
-      navigate('/dashboard');
-    } else {
-      toast.error('Identity Verification Failed');
+    try {
+      const success = await login(formData.email, formData.password);
+      if (success) {
+        toast.success('Access Granted - Synchronizing Session');
+        navigate('/dashboard');
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Identity Verification Failed');
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   return (

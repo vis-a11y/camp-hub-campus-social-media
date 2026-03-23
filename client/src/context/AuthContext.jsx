@@ -25,6 +25,7 @@ export const AuthProvider = ({ children }) => {
     localStorage.setItem('campchat_user', JSON.stringify(data));
     axios.defaults.headers.common['Authorization'] = `Bearer ${data.token}`;
     navigate('/dashboard');
+    return true;
   };
 
   const register = async (userData) => {
@@ -33,6 +34,7 @@ export const AuthProvider = ({ children }) => {
     localStorage.setItem('campchat_user', JSON.stringify(data));
     axios.defaults.headers.common['Authorization'] = `Bearer ${data.token}`;
     navigate('/dashboard');
+    return true;
   };
 
   const logout = () => {
