@@ -12,16 +12,7 @@ const ProjectsPage = () => {
   const [activeCategory, setActiveCategory] = useState('all');
 
   const projects = [
-    {
-      id: 1,
-      name: 'Campus AI Navigator',
-      description: 'An AI-powered indoor navigation system for SSJCOE using graph algorithms and React Native.',
-      lead: 'ananya_sharma',
-      team: 12,
-      tags: ['React Native', 'AI', 'Graph', 'Mobile'],
-      status: 'Active',
-      image: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=800'
-    },
+
     {
       id: 2,
       name: 'Solar Grid Sync',
@@ -81,7 +72,7 @@ const ProjectsPage = () => {
              />
           </div>
           <div className="flex gap-4 overflow-x-auto no-scrollbar pb-2">
-             {['All', 'AI', 'IoT', 'Web3', 'Mobile'].map(cat => (
+             {['All', 'IoT', 'Web3', 'Mobile'].map(cat => (
                <button 
                  key={cat}
                  onClick={() => setActiveCategory(cat.toLowerCase())}
@@ -137,21 +128,6 @@ const ProjectsPage = () => {
          ))}
       </div>
 
-      {/* AI Suggestions Overlay */}
-      <div className="mt-20 p-12 bg-slate-900 dark:bg-slate-950 rounded-[3.5rem] shadow-4xl relative overflow-hidden group border border-white/5">
-          <div className="absolute inset-0 bg-gradient-to-tr from-sky-500/10 to-transparent"></div>
-          <Zap size={100} className="absolute -right-8 -bottom-8 text-sky-500 opacity-10 rotate-12 group-hover:scale-125 group-hover:rotate-0 transition-transform duration-1000" />
-          <div className="relative z-10 flex flex-col md:flex-row items-center gap-10">
-             <div className="w-24 h-24 bg-white/5 rounded-[2rem] flex items-center justify-center shadow-4xl border border-white/5">
-                <Terminal size={48} className="text-sky-500" />
-             </div>
-             <div className="flex-1 text-center md:text-left">
-                <h3 className="text-2xl font-black text-white italic tracking-tighter uppercase mb-4">AI Mission Discovery</h3>
-                <p className="text-sm font-bold text-slate-400 uppercase tracking-widest italic leading-relaxed max-w-xl opacity-80">Our recursive signal engine has detected 4 new mission hubs aligning with your tech-stack metadata. Synchronize frequently for high-priority matching.</p>
-             </div>
-             <button className="px-12 py-5 bg-sky-500 text-white rounded-[2rem] font-black text-[10px] uppercase tracking-[0.5em] italic hover:scale-105 active:scale-95 transition-all shadow-4xl shadow-sky-500/20">Establishing Link...</button>
-          </div>
-      </div>
     </div>
   );
 };

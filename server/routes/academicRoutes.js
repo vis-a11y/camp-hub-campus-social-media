@@ -7,7 +7,6 @@ const {
 } = require('../controllers/postController');
 const { createEvent, registerForEvent, getEventRegistrants, getAllEvents } = require('../controllers/eventController');
 const { createGroup, getMyGroups, joinGroup } = require('../controllers/groupController');
-const { getAiSummary, solveDoubt, detectEmotion } = require('../controllers/aiController');
 const { getStories, createStory, viewStory, deleteStory } = require('../controllers/storyController');
 const { getNotifications, getUnreadCount, markAsRead, markOneAsRead, deleteNotification } = require('../controllers/notificationController');
 const { getClubs, createClub, joinClub, getCommittees, createCommittee } = require('../controllers/clubController');
@@ -42,11 +41,6 @@ router.get('/notifications/unread-count', protect, getUnreadCount);
 router.put('/notifications/mark-all-read', protect, markAsRead);
 router.put('/notifications/:id/read', protect, markOneAsRead);
 router.delete('/notifications/:id', protect, deleteNotification);
-
-// AI Features
-router.post('/ai/summarize', protect, getAiSummary);
-router.post('/ai/solve-doubt', protect, solveDoubt);
-router.post('/ai/detect-emotion', protect, detectEmotion);
 
 // Events
 router.route('/events')

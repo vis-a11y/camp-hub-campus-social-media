@@ -4,7 +4,7 @@ import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { 
   Settings, Grid, Bookmark, Users, MessageCircle, MoreHorizontal, Link as LinkIcon, 
-  Image as ImageIcon, Edit, Check, Link2, LogOut, Award, ShieldCheck, Zap, Activity, Brain, Heart, MessageSquare, X, ChevronRight
+  Image as ImageIcon, Edit, Check, Link2, LogOut, Award, ShieldCheck, Zap, Activity, Heart, MessageSquare, X, ChevronRight
 } from 'lucide-react';
 import PostCard from '../components/PostCard';
 import toast from 'react-hot-toast';

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Mail, Lock, Zap, ShieldCheck, Activity, Brain } from 'lucide-react';
+import { Mail, Lock, Zap, ShieldCheck, Activity } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const LoginPage = () => {
@@ -50,8 +50,7 @@ const LoginPage = () => {
                <div className="flex flex-col gap-6">
                   {[
                     { icon: ShieldCheck, label: 'Identity Protection v4.0', color: 'text-emerald-500' },
-                    { icon: Activity, label: 'Real-time Campus Analytics', color: 'text-sky-500' },
-                    { icon: Brain, label: 'AI Powered Peer Sync', color: 'text-indigo-500' }
+                    { icon: Activity, label: 'Real-time Campus Analytics', color: 'text-sky-500' }
                   ].map((feat, idx) => (
                     <div key={idx} className="flex items-center gap-4 group cursor-default">
                        <div className={`w-12 h-12 bg-white dark:bg-slate-900 rounded-2xl flex items-center justify-center shadow-lg border border-slate-100 dark:border-white/5 group-hover:scale-110 transition-transform ${feat.color}`}>
