@@ -226,7 +226,7 @@ const Dashboard = () => {
                                  </div>
                                  <div>
                                     <p className="text-[13px] font-bold text-slate-900 dark:text-white group-hover:text-indigo-500 transition-colors uppercase tracking-tight">{s.firstName} {s.lastName?.[0]}.</p>
-                                    <p className="text-[11px] text-slate-400 mt-0.5">{s.department || 'Campus Student'}</p>
+                                    <p className="text-[11px] text-slate-400 mt-0.5">{s.branch || 'Campus Student'}</p>
                                  </div>
                               </div>
                               <button onClick={(e) => { e.stopPropagation(); handleFollow(s._id); }} className="p-2 bg-indigo-500/10 hover:bg-indigo-500 text-indigo-600 hover:text-white rounded-lg transition-all active:scale-90">

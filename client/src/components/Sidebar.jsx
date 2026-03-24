@@ -29,7 +29,7 @@ const Sidebar = () => {
   };
 
   return (
-    <div className="fixed left-0 top-0 bottom-0 w-[85px] xl:w-[280px] bg-white dark:bg-slate-950 border-r border-slate-200 dark:border-white/5 p-4 xl:p-8 flex flex-col z-[100] transition-all duration-300 overflow-y-auto no-scrollbar">
+    <div className="hidden lg:flex fixed left-0 top-0 bottom-0 w-[85px] xl:w-[280px] bg-white dark:bg-slate-950 border-r border-slate-200 dark:border-white/5 p-4 xl:p-8 flex-col z-[100] transition-all duration-300 overflow-y-auto no-scrollbar">
       {/* Premium Campus Logo */}
       <div className="py-10 px-4 mb-2 select-none cursor-pointer flex items-center gap-3 group" onClick={() => navigate('/dashboard')}>
         <div className="w-10 h-10 accent-gradient-bg rounded-xl flex items-center justify-center text-white shadow-lg shadow-indigo-500/20 group-hover:rotate-12 transition-transform duration-300">

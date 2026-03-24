@@ -44,18 +44,28 @@ app.post('/api/upload', upload.single('file'), (req, res) => {
 });
 
 const mongoURI = process.env.MONGODB_URI;
-console.log('📡 Attempting to connect to MongoDB...');
 
-if (!mongoURI) {
-  console.warn('⚠️ Warning: MONGODB_URI is not defined. Falling back to localhost (fails on Railway).');
+// Railway and Production environments strict check
+if (!mongoURI && process.env.RAILWAY_ENVIRONMENT) {
+  console.error('\n❌ CRITICAL ERROR: MONGODB_URI is not defined in Railway Environment!');
+  console.error('💡 To fix this:');
+  console.log('   1. Open your Railway Dashboard.');
+  console.log('   2. Go to your Server service -> Variables.');
+  console.log('   3. Add a new variable called MONGODB_URI.');
+  console.log('   4. Paste your MongoDB connection string (e.g., from Mongo Atlas or the Railway MongoDB plugin).\n');
+  process.exit(1);
 }
+
+console.log('📡 Attempting to connect to MongoDB...');
 
 mongoose.connect(mongoURI || 'mongodb://localhost:27017/campchat')
   .then(() => console.log('✅ Connected to MongoDB'))
   .catch((err) => {
     console.error('❌ MongoDB Connection Error:', err.message);
     if (!mongoURI) {
-      console.error('💡 TIP: You are trying to connect to localhost on Railway. Set your MONGODB_URI in the Railway dashboard variables.');
+      console.error('💡 TIP: You are trying to connect to localhost. This WILL fail on Railway. Set your MONGODB_URI in the Railway dashboard.');
+    } else {
+      console.error('💡 TIP: Check if your IP address is whitelisted in MongoDB Atlas or if the credentials are correct.');
     }
   });
 

@@ -244,7 +244,7 @@ const ProfilePage = () => {
       {/* Grid Content */}
       <div className="animate-fade-in">
         {activeTab === 'posts' && (
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-3 gap-1 md:gap-6">
             {posts.length > 0 ? (
               posts.map(post => (
                 <div 
@@ -286,7 +286,7 @@ const ProfilePage = () => {
 
         {/* Other Tabs Placeholders */}
         {activeTab === 'saved' && (
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-6 animate-fade-in">
+          <div className="grid grid-cols-3 gap-1 md:gap-6 animate-fade-in">
              {loadingSaved ? (
                 [1,2,3].map(i => <div key={i} className="aspect-square bg-slate-100 dark:bg-white/5 animate-pulse rounded-2xl"></div>)
              ) : savedPosts.length > 0 ? (

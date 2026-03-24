@@ -17,10 +17,13 @@ const seedAdmin = async () => {
       console.log('Admin already exists.');
     } else {
       const admin = await User.create({
-        name: 'Sardar Vallabhbhai JCOE Admin',
+        firstName: 'Hub',
+        lastName: 'Admin',
         email: adminEmail,
         password: adminPassword,
         role: 'admin',
+        branch: 'Administration',
+        year: 2026,
         reputationScore: 999
       });
       console.log('✅ Admin User Created:', admin.email);

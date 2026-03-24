@@ -2,10 +2,11 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import { 
-   Search, Plus, MapPin, Calendar, Clock, ArrowRight, X, Info, Camera, Trash2, ShieldCheck, Terminal, Upload, CameraIcon, Sparkles, MoreHorizontal, MessageSquare, Heart, Bookmark, Smile, Minus, PlusSquare
+   Search, Plus, MapPin, Calendar, Clock, ArrowRight, X, Info, Camera, Trash2, ShieldCheck, Terminal, Upload, Sparkles, MoreHorizontal, MessageSquare, Heart, Bookmark, Smile, Minus, PlusSquare, Users, Activity
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
+// Premium Experiences Hub for Campus Node Synchronization
 const EventsPage = () => {
   const { user } = useAuth();
   const [events, setEvents] = useState([]);
@@ -21,6 +22,8 @@ const EventsPage = () => {
   });
 
   const [imagePreview, setImagePreview] = useState(null);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [selectedEvent, setSelectedEvent] = useState(null);
   const [registrationsModal, setRegistrationsModal] = useState({ show: false, users: [], eventName: '' });
 
   useEffect(() => {
@@ -43,6 +46,7 @@ const EventsPage = () => {
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
+      setSelectedFile(file);
       const reader = new FileReader();
       reader.onloadend = () => setImagePreview(reader.result);
       reader.readAsDataURL(file);
@@ -57,9 +61,17 @@ const EventsPage = () => {
     }
     
     try {
+       let uploadedImageUrl = '';
+       if (selectedFile) {
+          const formData = new FormData();
+          formData.append('file', selectedFile);
+          const { data: uploadResp } = await axios.post('/api/upload', formData);
+          uploadedImageUrl = uploadResp.url;
+       }
+
        const eventData = {
           ...eventForm,
-          image: imagePreview,
+          image: uploadedImageUrl || imagePreview, // Use uploaded if exists, else fallback
           date: new Date(eventForm.date).toISOString()
        };
 
@@ -68,6 +80,7 @@ const EventsPage = () => {
        
        setShowCreateModal(false);
        setImagePreview(null);
+       setSelectedFile(null);
        setEventForm({ title: '', description: '', date: '', time: '10:00 AM', location: '', type: 'Academic Hub' });
        
        toast.success('Event Established');
@@ -87,7 +100,6 @@ const EventsPage = () => {
   };
 
   const handleViewRegistrants = async (event) => {
-    if (!canCreate) return;
     try {
       const { data } = await axios.get(`/api/academic/events/${event._id}/registrations`);
       setRegistrationsModal({
@@ -150,7 +162,11 @@ const EventsPage = () => {
           [1, 2, 3].map(i => <div key={i} className="h-[500px] bg-slate-50 dark:bg-white/5 rounded-[40px] animate-pulse"></div>)
         ) : events.length > 0 ? (
           events.map(event => (
-            <div key={event._id} className="premium-card group/card overflow-hidden flex flex-col bg-white dark:bg-slate-900 border-none h-full transition-transform hover:-translate-y-2">
+            <div 
+               key={event._id} 
+               onClick={() => setSelectedEvent(event)}
+               className="premium-card group/card overflow-hidden flex flex-col bg-white dark:bg-slate-900 border-none h-full transition-transform hover:-translate-y-2 cursor-pointer"
+            >
                {/* Event Image - Immersive */}
                <div className="h-64 overflow-hidden relative">
                   <img src={event.image || 'https://images.unsplash.com/photo-1540575861501-7cf05a4b125a?w=800'} alt="" className="w-full h-full object-cover transition-transform duration-1000 group-hover/card:scale-110" />
@@ -205,27 +221,27 @@ const EventsPage = () => {
                         </div>
                      </div>
 
-                     {canCreate ? (
-                        <button 
-                           onClick={() => handleViewRegistrants(event)}
-                           className="w-full py-4 bg-slate-50 dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10 text-indigo-500 text-[11px] font-bold tracking-[0.2em] transition-all uppercase rounded-2xl flex items-center justify-center gap-2"
-                        >
-                           <Users size={16} /> 
-                           {event.registrations?.length || 0} Registered Admissions
-                        </button>
-                     ) : (
-                        <button 
-                           onClick={() => handleRegister(event._id)}
-                           disabled={event.registrations?.includes(user?._id)}
-                           className={`w-full py-4 text-[11px] font-bold tracking-[0.2em] transition-all uppercase rounded-2xl shadow-xl active:scale-95 ${
-                              event.registrations?.includes(user?._id)
-                              ? 'bg-emerald-500/10 text-emerald-600 cursor-not-allowed border border-emerald-500/20 shadow-none'
-                              : 'accent-gradient-bg text-white shadow-indigo-500/20'
-                           }`}
-                        >
-                           {event.registrations?.includes(user?._id) ? 'Confirmed Participation' : 'Claim Seat Now'}
-                        </button>
-                     )}
+                      <button 
+                         onClick={(e) => { e.stopPropagation(); handleViewRegistrants(event); }}
+                         className="w-full py-4 bg-slate-50 dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10 text-indigo-500 text-[11px] font-bold tracking-[0.2em] transition-all uppercase rounded-2xl flex items-center justify-center gap-2"
+                      >
+                         <Users size={16} /> 
+                         {event.registrations?.length || 0} Registered Admissions
+                      </button>
+
+                      {!canCreate && (
+                         <button 
+                            onClick={(e) => { e.stopPropagation(); handleRegister(event._id); }}
+                            disabled={event.registrations?.includes(user?._id)}
+                            className={`w-full py-4 text-[11px] font-bold tracking-[0.2em] transition-all uppercase rounded-2xl shadow-xl active:scale-95 ${
+                               event.registrations?.includes(user?._id)
+                               ? 'bg-emerald-500/10 text-emerald-600 cursor-not-allowed border border-emerald-500/20 shadow-none'
+                               : 'accent-gradient-bg text-white shadow-indigo-500/20'
+                            }`}
+                         >
+                            {event.registrations?.includes(user?._id) ? 'Confirmed Participation' : 'Claim Seat Now'}
+                         </button>
+                      )}
                   </div>
                </div>
             </div>
@@ -257,7 +273,7 @@ const EventsPage = () => {
                       {!imagePreview ? (
                          <label className="flex flex-col items-center gap-6 cursor-pointer p-10 text-center">
                             <div className="w-20 h-20 bg-indigo-500/10 rounded-3xl flex items-center justify-center text-indigo-500 mb-2">
-                               <CameraIcon size={40} />
+                               <Camera size={40} />
                             </div>
                             <div>
                                <p className="text-xl font-bold text-slate-900 dark:text-white">Event Poster</p>
@@ -368,6 +384,90 @@ const EventsPage = () => {
                            </div>
                         </div>
                      ))
+                  )}
+               </div>
+            </div>
+         </div>
+      )}
+      {/* Event Details Modal - Premium */}
+      {selectedEvent && (
+         <div className="modal-backdrop px-4 z-[200]">
+            <div className="bg-white dark:bg-slate-900 w-full max-w-2xl rounded-[40px] shadow-3xl overflow-hidden border border-slate-200 dark:border-white/10 animate-fade-in flex flex-col max-h-[90vh]">
+               <div className="h-[300px] sm:h-[400px] relative shrink-0 bg-slate-100 dark:bg-black">
+                  <img src={selectedEvent.image || 'https://images.unsplash.com/photo-1540575861501-7cf05a4b125a?w=800'} className="w-full h-full object-contain" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent pointer-events-none"></div>
+                  <button onClick={() => setSelectedEvent(null)} className="absolute top-6 right-6 w-12 h-12 bg-black/40 backdrop-blur-md rounded-2xl flex items-center justify-center text-white hover:bg-black/60 transition-all z-40 outline-none border border-white/10 shadow-2xl"><X size={24} /></button>
+                  <div className="absolute bottom-8 left-10 right-10 z-30 pointer-events-none">
+                     <h3 className="text-3xl font-black text-white leading-tight drop-shadow-2xl">{selectedEvent.title}</h3>
+                     <p className="text-indigo-400 text-xs font-black uppercase tracking-[0.3em] mt-2 drop-shadow-md flex items-center gap-2">
+                        <Activity size={12} /> {selectedEvent.type || 'Mission Node'}
+                     </p>
+                  </div>
+               </div>
+               
+               <div className="p-8 space-y-8 overflow-y-auto no-scrollbar">
+                  <div className="flex flex-wrap gap-8 items-center border-b border-slate-100 dark:border-white/5 pb-8">
+                     <div className="flex items-center gap-3">
+                        <Calendar size={18} className="text-indigo-500" />
+                        <div>
+                           <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none mb-1">Date</p>
+                           <p className="text-[14px] font-bold text-slate-900 dark:text-white">{new Date(selectedEvent.date).toLocaleDateString()}</p>
+                        </div>
+                     </div>
+                     <div className="flex items-center gap-3 border-l border-slate-100 dark:border-white/5 pl-8">
+                        <Clock size={18} className="text-indigo-500" />
+                        <div>
+                           <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none mb-1">Time</p>
+                           <p className="text-[14px] font-bold text-slate-900 dark:text-white">{selectedEvent.time}</p>
+                        </div>
+                     </div>
+                     <div className="flex items-center gap-3 border-l border-slate-100 dark:border-white/5 pl-8">
+                        <MapPin size={18} className="text-indigo-500" />
+                        <div>
+                           <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none mb-1">Venue</p>
+                           <p className="text-[14px] font-bold text-slate-900 dark:text-white">{selectedEvent.location}</p>
+                        </div>
+                     </div>
+                  </div>
+
+                  <div className="space-y-4">
+                     <h4 className="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-widest">About the Experience</h4>
+                     <p className="text-slate-500 dark:text-slate-400 leading-relaxed font-normal whitespace-pre-wrap">{selectedEvent.description}</p>
+                  </div>
+
+                  <div className="flex items-center justify-between p-6 bg-slate-50 dark:bg-white/5 rounded-3xl border border-slate-100 dark:border-white/5">
+                     <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 rounded-2xl campus-story-ring p-0.5">
+                           <div className="w-full h-full rounded-2xl bg-white dark:bg-slate-800 flex items-center justify-center font-bold text-indigo-500 overflow-hidden">
+                              {selectedEvent.organizer?.profilePic ? <img src={selectedEvent.organizer.profilePic} /> : selectedEvent.organizer?.firstName?.[0]}
+                           </div>
+                        </div>
+                        <div>
+                           <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Organized By</p>
+                           <p className="text-sm font-bold text-slate-900 dark:text-white">{selectedEvent.organizer?.firstName} {selectedEvent.organizer?.lastName}</p>
+                        </div>
+                     </div>
+                     <button 
+                        onClick={() => handleViewRegistrants(selectedEvent)}
+                        className="bg-indigo-500/10 text-indigo-600 px-6 py-2 rounded-xl text-xs font-bold uppercase tracking-widest hover:bg-indigo-500 hover:text-white transition-all flex items-center gap-2"
+                     >
+                        <Users size={16} /> 
+                        {selectedEvent.registrations?.length || 0} Joined
+                     </button>
+                  </div>
+
+                  {!canCreate && (
+                     <button 
+                        onClick={() => handleRegister(selectedEvent._id)}
+                        disabled={selectedEvent.registrations?.includes(user?._id)}
+                        className={`w-full py-5 rounded-2xl text-[12px] font-bold tracking-[0.2em] transition-all uppercase shadow-2xl ${
+                           selectedEvent.registrations?.includes(user?._id)
+                           ? 'bg-emerald-500/10 text-emerald-600 border border-emerald-500/20'
+                           : 'accent-gradient-bg text-white shadow-indigo-500/20 active:scale-95'
+                        }`}
+                     >
+                        {selectedEvent.registrations?.includes(user?._id) ? 'Seat Reserved' : 'Secure Admission Now'}
+                     </button>
                   )}
                </div>
             </div>

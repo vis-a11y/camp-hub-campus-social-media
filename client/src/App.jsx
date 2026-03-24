@@ -62,7 +62,7 @@ function AppRoutes() {
             </div>
           )}
           
-          <main className="min-h-screen max-w-[1400px] mx-auto px-4 md:px-8 py-10 animate-fade-in pb-32">
+          <main className="min-h-screen max-w-[1400px] mx-auto px-0 md:px-8 py-0 md:py-10 animate-fade-in pb-32">
              <Routes>
                <Route path="/login"    element={<LoginPage />} />
                <Route path="/register" element={<RegisterPage />} />
