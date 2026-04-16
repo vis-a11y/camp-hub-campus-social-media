@@ -69,25 +69,25 @@ app.post('/api/upload', upload.single('file'), (req, res) => {
 
 const mongoURI = process.env.MONGODB_URI;
 
-// Render/Railway and Production environments strict check
-if (!mongoURI && (process.env.RAILWAY_ENVIRONMENT || process.env.RENDER)) {
-  console.error('\n❌ CRITICAL ERROR: MONGODB_URI is not defined in Production Environment!');
-  console.error('💡 To fix this:');
-  console.log('   1. Open your Render/Railway Dashboard.');
-  console.log('   2. Go to your Server service -> Environment Variables.');
-  console.log('   3. Add a new variable called MONGODB_URI.');
-  console.log('   4. Paste your MongoDB connection string.\n');
-  process.exit(1);
+// Better validation for the connection string
+const finalMongoURI = (mongoURI && mongoURI.startsWith('mongodb')) 
+  ? mongoURI 
+  : 'mongodb://localhost:27017/campchat';
+
+if (mongoURI && !mongoURI.startsWith('mongodb')) {
+  console.warn(`⚠️ Warning: MONGODB_URI ("${mongoURI}") is invalid. Falling back to local MongoDB.`);
 }
 
 console.log('📡 Attempting to connect to MongoDB...');
 
-mongoose.connect(mongoURI || 'mongodb://localhost:27017/campchat')
+mongoose.connect(finalMongoURI)
   .then(() => console.log('✅ Connected to MongoDB'))
   .catch((err) => {
     console.error('❌ MongoDB Connection Error:', err.message);
-    if (!mongoURI) {
-      console.error('💡 TIP: You are trying to connect to localhost. This WILL fail on Render. Set your MONGODB_URI in the dashboard.');
+    if (finalMongoURI.includes('localhost')) {
+      console.error('💡 TIP: Ensure your LOCAL MongoDB service is running (mongod).');
+    } else {
+      console.error('💡 TIP: Check your MONGODB_URI credentials and whitelist your IP in Atlas.');
     }
   });
 

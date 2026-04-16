@@ -6,7 +6,12 @@ dotenv.config();
 
 const seedAdmin = async () => {
   try {
-    await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/campchat');
+    const mongoURI = process.env.MONGODB_URI;
+    const finalMongoURI = (mongoURI && mongoURI.startsWith('mongodb')) 
+      ? mongoURI 
+      : 'mongodb://localhost:27017/campchat';
+
+    await mongoose.connect(finalMongoURI);
     console.log('✅ Connected to MongoDB for Seeding');
 
     const adminEmail = process.env.ADMIN_EMAIL || 'namessjcoe@gmail.com';
