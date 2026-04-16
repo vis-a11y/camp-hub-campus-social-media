@@ -48,10 +48,21 @@ app.use(helmet({
 app.use(compression()); // Compress responses
 
 const corsOptions = {
-  origin: process.env.CLIENT_URL || '*',
+  origin: (origin, callback) => {
+    const allowed = [process.env.CLIENT_URL, 'http://localhost:5173', 'http://localhost:3000'].filter(Boolean);
+    if (!origin || allowed.includes(origin) || allowed.length === 0 || !process.env.NODE_ENV || process.env.NODE_ENV === 'development') {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
   optionsSuccessStatus: 200,
 };
 app.use(cors(corsOptions));
+app.options('*', cors(corsOptions)); // Enable pre-flight for all routes
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 app.use(morgan(process.env.NODE_ENV === 'production' ? 'combined' : 'dev'));

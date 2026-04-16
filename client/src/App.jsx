@@ -20,7 +20,8 @@ import { Toaster } from 'react-hot-toast';
 import axios from 'axios';
 
 // POINTED TO REAL-TIME BACKEND
-axios.defaults.baseURL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001';
+// In development, we prefer the Vite proxy. In production, we use the specific Backend URL.
+axios.defaults.baseURL = import.meta.env.VITE_API_BASE_URL || (import.meta.env.DEV ? '' : 'http://localhost:5001');
 
 const ProtectedRoute = ({ children }) => {
   const { user } = useAuth();
