@@ -8,6 +8,8 @@ const morgan = require('morgan');
 const path = require('path');
 const multer = require('multer');
 const fs = require('fs');
+const helmet = require('helmet');
+const compression = require('compression');
 
 dotenv.config();
 
@@ -40,6 +42,11 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 // Middleware
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: "cross-origin" }, // Allows images from other origins (like your uploads)
+}));
+app.use(compression()); // Compress responses
+
 const corsOptions = {
   origin: process.env.CLIENT_URL || '*',
   optionsSuccessStatus: 200,
