@@ -1,100 +1,51 @@
-# ⚡ CampChat — Campus Social Media & Academic Hub
+# 🏫 CampChat - Campus Hub
 
-CampChat is a premium, high-performance social networking platform designed specifically for academic environments. It blends the immersive experience of modern social media (like Instagram) with the critical functionalities of a campus management system, creating a unified "Digital Core" for students, faculty, and administrators.
+CampChat is a real-time campus community platform designed for students and faculty to connect, share resources, and collaborate on projects.
 
----
+## 🚀 Features
+- **Real-time Chat**: Connect with peers instantly using Socket.io.
+- **Academic Hub**: Share posts, polls, and academic resources.
+- **Event Management**: Faculty can create events and students can register.
+- **Study Groups**: Create and join focused study communities.
+- **Secure Authentication**: JWT-based login and registration.
 
-## ✨ Features
+## 🛠️ Tech Stack
+- **Frontend**: React, Tailwind CSS, Vite.
+- **Backend**: Node.js, Express, MongoDB (Mongoose).
+- **Communication**: Socket.io for real-time messaging.
+- **Security**: Helmet, JWT, and detailed environment validation.
 
-### 📸 **Instagram-Inspired Stories Hub**
-- **Visual Narratives**: Shared student life through image-based stories.
-- **Audio Scapes**: Background music integration for an immersive campus atmosphere.
-- **Auto-Expiry**: Content rotates every 24 hours to keep the feed fresh.
+## 📦 Project Structure
+- `/client`: React frontend.
+- `/server`: Express backend API.
 
-### 🏛️ **Academic Identity**
-- **Customizable Profiles**: Set your branch/department (Computer, IT, EXTC, Civil, Mechanical).
-- **Social Graph**: Follow/Unfollow peers and professors.
-- **Portfolio Sync**: Link your external projects and achievements.
+## 🚦 Getting Started
 
-### 📑 **Intelligent Feed & Discovery**
-- **Dynamic Categorization**: Classify posts as *Doubt*, *Announcement*, or *General Hub*.
-- **Trending Metrics**: Real-time engagement tracking to highlight the most discussed campus topics.
-- **Resource Archiving**: Save critical notices or inspiring posts directly to your personal library.
+### Prerequisites
+- Node.js (v16+)
+- MongoDB (Local or Atlas)
 
-### 🗓️ **Experiences & Events**
-- **Campus Organizations**: Faculty and admins can publish official events.
-- **One-Click Registration**: Secure your spot in workshops, webinars, or fests instantly.
+### Setup
+1. **Clone the repo**:
+   ```bash
+   git clone https://github.com/vis-a-11y/CampChat---Campus-Hub.git
+   ```
 
-### 💬 **Real-time Communication**
-- **Socket.io Integration**: Instant messaging with "Typing" indicators and "Seen" status.
-- **Circle Chats**: Connect with project partners or study groups seamlessly.
+2. **Backend Setup**:
+   ```bash
+   cd server
+   npm install
+   # Create .env based on .env.example
+   npm run dev
+   ```
 
----
+3. **Frontend Setup**:
+   ```bash
+   cd client
+   npm install
+   # Create .env based on .env.example
+   npm run dev
+   ```
 
-## 🛠️ Technology Stack
-
-| Layer | Technology |
-| :--- | :--- |
-| **Frontend** | React 18, Vite, Tailwind CSS, Lucide React |
-| **Backend** | Node.js, Express.js |
-| **Database** | MongoDB (Mongoose ODM) |
-| **Real-time**| Socket.io |
-| **Animation**| Framer Motion & CSS Magic |
-
----
-
-## 🚀 Getting Started
-
-### 1. Repository Setup
-```bash
-git clone https://github.com/vis-a-11y/CampChat---Campus-Hub.git
-cd CampChat---Campus-Hub
-```
-
-### 2. Configure Environment
-Create a `.env` file in the `/server` directory:
-```env
-PORT=5001
-MONGODB_URI=your_mongodb_connection_string
-JWT_SECRET=your_premium_secret_key
-ADMIN_EMAIL=your_admin@domain.com
-ADMIN_PASSWORD=your_secure_pass
-```
-
-### 3. Install Dependencies
-```bash
-# Install Server Dependencies
-cd server
-npm install
-
-# Install Client Dependencies
-cd ../client
-npm install
-```
-
-### 4. Initiate the Hub
-```bash
-# Run Backend (Port 5001)
-cd server
-npm run dev
-
-# Run Frontend (Port 5173)
-cd client
-npm run dev
-```
-
----
-
-## 🛰️ API Protocol
-
-| Method | Endpoint | Description |
-| :--- | :--- | :--- |
-| `POST` | `/api/auth/register` | Establish a new academic identity node. |
-| `PUT` | `/api/auth/me` | Update node parameters and profile metadata. |
-| `GET` | `/api/academic/posts` | Fetch the global feed sync. |
-| `POST` | `/api/academic/stories` | Broadcast a new campus story. |
-
----
-
-## 🛡️ License
-Designed and developed for the modern academic ecosystem. All rights reserved. 🚀
+## 📄 License
+This project is licensed under the ISC License.
