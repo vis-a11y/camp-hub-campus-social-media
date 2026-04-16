@@ -13,9 +13,18 @@ dotenv.config();
 
 const app = express();
 const server = http.createServer(app);
+
+// Use socket.io with updated CORS
 const io = new Server(server, {
-  cors: { origin: '*', methods: ['GET', 'POST', 'PUT', 'DELETE'] },
+  cors: {
+    origin: process.env.CLIENT_URL || '*',
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    credentials: true,
+  },
 });
+
+// Trust proxy for Render (needed for req.protocol to be 'https')
+app.set('trust proxy', 1);
 
 // Ensure uploads directory exists
 const uploadsDir = path.join(__dirname, 'uploads');
@@ -30,29 +39,37 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
-app.use(cors());
+// Middleware
+const corsOptions = {
+  origin: process.env.CLIENT_URL || '*',
+  optionsSuccessStatus: 200,
+};
+app.use(cors(corsOptions));
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
-app.use(morgan('dev'));
+app.use(morgan(process.env.NODE_ENV === 'production' ? 'combined' : 'dev'));
 
 app.use('/uploads', express.static(uploadsDir));
 
 app.post('/api/upload', upload.single('file'), (req, res) => {
   if (!req.file) return res.status(400).json({ message: 'No file uploaded' });
-  const url = `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`;
+  
+  // Use a relative path or a full URL based on the environment
+  const protocol = req.headers['x-forwarded-proto'] || req.protocol;
+  const url = `${protocol}://${req.get('host')}/uploads/${req.file.filename}`;
   res.json({ url, filename: req.file.filename });
 });
 
 const mongoURI = process.env.MONGODB_URI;
 
-// Railway and Production environments strict check
-if (!mongoURI && process.env.RAILWAY_ENVIRONMENT) {
-  console.error('\n❌ CRITICAL ERROR: MONGODB_URI is not defined in Railway Environment!');
+// Render/Railway and Production environments strict check
+if (!mongoURI && (process.env.RAILWAY_ENVIRONMENT || process.env.RENDER)) {
+  console.error('\n❌ CRITICAL ERROR: MONGODB_URI is not defined in Production Environment!');
   console.error('💡 To fix this:');
-  console.log('   1. Open your Railway Dashboard.');
-  console.log('   2. Go to your Server service -> Variables.');
+  console.log('   1. Open your Render/Railway Dashboard.');
+  console.log('   2. Go to your Server service -> Environment Variables.');
   console.log('   3. Add a new variable called MONGODB_URI.');
-  console.log('   4. Paste your MongoDB connection string (e.g., from Mongo Atlas or the Railway MongoDB plugin).\n');
+  console.log('   4. Paste your MongoDB connection string.\n');
   process.exit(1);
 }
 
@@ -63,9 +80,7 @@ mongoose.connect(mongoURI || 'mongodb://localhost:27017/campchat')
   .catch((err) => {
     console.error('❌ MongoDB Connection Error:', err.message);
     if (!mongoURI) {
-      console.error('💡 TIP: You are trying to connect to localhost. This WILL fail on Railway. Set your MONGODB_URI in the Railway dashboard.');
-    } else {
-      console.error('💡 TIP: Check if your IP address is whitelisted in MongoDB Atlas or if the credentials are correct.');
+      console.error('💡 TIP: You are trying to connect to localhost. This WILL fail on Render. Set your MONGODB_URI in the dashboard.');
     }
   });
 
@@ -80,17 +95,16 @@ app.use('/api/academic', academicRoutes);
 app.use('/api/chat', chatRoutes);
 app.use('/api/message', messageRoutes);
 
+// Health check endpoint for Render
+app.get('/health', (req, res) => res.status(200).send('OK'));
 app.get('/', (req, res) => res.json({ message: 'CampChat API is running 🚀' }));
 
-// Socket.io Implementation (Instagram Style)
+// Socket.io Implementation
 io.on('connection', (socket) => {
   console.log('Connected to socket.io');
 
   socket.on('setup', (userData) => {
-    if (!userData?._id) {
-      return;
-    }
-
+    if (!userData?._id) return;
     socket.userId = userData._id.toString();
     socket.join(userData._id);
     console.log('User setup:', userData._id);
@@ -125,3 +139,4 @@ io.on('connection', (socket) => {
 
 const PORT = process.env.PORT || 5001; 
 server.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+
