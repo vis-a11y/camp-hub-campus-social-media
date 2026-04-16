@@ -29,13 +29,6 @@ const safeUser = (user, token) => ({
 const registerUser = async (req, res) => {
   const { firstName, lastName, email, password, role, branch, year } = req.body;
 
-  const allowedDomain = process.env.ALLOWED_DOMAIN || 'gmail.com'; // Adjust for demo
-  const adminEmail = process.env.ADMIN_EMAIL || 'namessjcoe@gmail.com';
-
-  if (!email.endsWith(allowedDomain) && email !== adminEmail) {
-    return res.status(400).json({ message: `Please use your ${allowedDomain} email` });
-  }
-
   try {
     const userExists = await User.findOne({ email });
     if (userExists) {
