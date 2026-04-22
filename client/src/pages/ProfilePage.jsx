@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import PostCard from '../components/PostCard';
 import toast from 'react-hot-toast';
+import { getMediaUrl } from '../utils/media';
 
 const ProfilePage = () => {
   const { id } = useParams();
@@ -125,7 +126,8 @@ const ProfilePage = () => {
   if (!user) return <div className="min-h-screen flex items-center justify-center bg-white dark:bg-black text-slate-400 font-medium font-sans">Loading profile...</div>;
 
   return (
-    <div className="max-w-[1000px] mx-auto px-4 py-10 animate-fade-in pb-32">
+    <>
+      <div className="max-w-[1000px] mx-auto px-4 py-10 animate-fade-in pb-32">
       {/* Header - Premium Redesign */}
       <header className="premium-card p-8 sm:p-12 mb-10 flex flex-col sm:flex-row items-center sm:items-start gap-10 sm:gap-20 bg-slate-50/50 dark:bg-white/5 relative overflow-hidden">
         {/* Background Accent Gradients */}
@@ -137,7 +139,7 @@ const ProfilePage = () => {
            <div className="w-28 h-28 sm:w-44 sm:h-44 rounded-3xl campus-story-ring p-1 shadow-2xl transition-transform duration-500 group-hover:scale-105">
               <div className="w-full h-full rounded-3xl overflow-hidden bg-slate-200 dark:bg-slate-800 border-4 border-white dark:border-slate-900 flex items-center justify-center">
                  {user.profilePic ? (
-                    <img src={user.profilePic} className="w-full h-full object-cover transition-transform group-hover:scale-110" alt="" />
+                    <img src={getMediaUrl(user.profilePic)} className="w-full h-full object-cover transition-transform group-hover:scale-110" alt="" />
                  ) : (
                     <span className="text-5xl font-bold accent-gradient-text uppercase">{user.firstName[0]}</span>
                  )}
@@ -253,7 +255,7 @@ const ProfilePage = () => {
                   onClick={() => navigate(`/dashboard?post=${post._id}`)}
                 >
                    {post.media ? (
-                     <img src={post.media} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt="" />
+                     <img src={getMediaUrl(post.media)} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt="" />
                    ) : (
                      <div className="w-full h-full flex items-center justify-center p-8 bg-indigo-500/5">
                         <p className="text-sm font-bold text-slate-500 text-center line-clamp-4 leading-relaxed italic">"{post.content}"</p>
@@ -336,7 +338,7 @@ const ProfilePage = () => {
               <div className="p-8 space-y-8 bg-white dark:bg-slate-900 overflow-y-auto no-scrollbar max-h-[70vh]">
                  <div className="flex items-center gap-6 p-6 bg-slate-100 dark:bg-white/5 rounded-3xl border border-slate-200 dark:border-white/5">
                     <div className="w-20 h-20 rounded-2xl overflow-hidden shadow-2xl shrink-0 group relative">
-                       {user.profilePic ? <img src={user.profilePic} className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center font-bold text-indigo-500 text-3xl accent-gradient-bg opacity-10 underline">{user.firstName[0]}</div>}
+                       {user.profilePic ? <img src={getMediaUrl(user.profilePic)} className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center font-bold text-indigo-500 text-3xl accent-gradient-bg opacity-10 underline">{user.firstName[0]}</div>}
                        <button onClick={() => fileInputRef.current?.click()} className="absolute inset-0 bg-black/50 flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity">
                           <ImageIcon size={20} />
                        </button>
@@ -399,7 +401,7 @@ const ProfilePage = () => {
                      <div key={c._id} className="flex items-center justify-between group p-3 hover:bg-slate-100 dark:hover:bg-white/5 rounded-2xl transition-all cursor-pointer" onClick={() => { navigate(`/profile/${c._id}`); setShowConnectionsModal(false); }}>
                         <div className="flex items-center gap-4">
                            <div className="w-14 h-14 rounded-2xl overflow-hidden shadow-lg shrink-0 border-2 border-transparent group-hover:border-indigo-500/50 transition-all">
-                              {c.profilePic ? <img src={c.profilePic} className="w-full h-full object-cover" /> : <div className="w-full h-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center font-bold text-indigo-500 uppercase">{c.firstName?.[0]}</div>}
+                              {c.profilePic ? <img src={getMediaUrl(c.profilePic)} className="w-full h-full object-cover" /> : <div className="w-full h-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center font-bold text-indigo-500 uppercase">{c.firstName?.[0]}</div>}
                            </div>
                            <div>
                               <p className="text-[15px] font-bold text-slate-900 dark:text-white leading-tight mb-1">{c.firstName} {c.lastName}</p>
@@ -420,7 +422,8 @@ const ProfilePage = () => {
             </div>
          </div>
       )}
-    </div>
+      </div>
+    </>
   );
 };
 
