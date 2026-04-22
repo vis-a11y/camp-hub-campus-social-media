@@ -13,6 +13,25 @@ const compression = require('compression');
 
 dotenv.config();
 
+// AUTO-CLEANUP: Removing unwanted/redundant files on startup
+const filesToRemove = [
+  path.join(__dirname, 'railway.json'),
+  path.join(__dirname, '../client/railway.json'),
+  path.join(__dirname, '../package-lock.json'), // Empty root lockfile
+  path.join(__dirname, 'seed.js')
+];
+
+filesToRemove.forEach(file => {
+  if (fs.existsSync(file)) {
+     try {
+       fs.unlinkSync(file);
+       console.log(`🧹 Auto-Clean: Removed ${path.basename(file)}`);
+     } catch (err) {
+       console.warn(`⚠️ Could not auto-remove ${file}:`, err.message);
+     }
+  }
+});
+
 const app = express();
 const server = http.createServer(app);
 
