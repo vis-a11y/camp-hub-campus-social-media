@@ -124,6 +124,18 @@ const Dashboard = () => {
     }
   };
 
+  const getMediaUrl = (url) => {
+    if (!url) return '';
+    if (url.startsWith('http')) {
+      if (url.includes('localhost:')) {
+        const path = url.split('/uploads/')[1];
+        return `${axios.defaults.baseURL}/uploads/${path}`;
+      }
+      return url;
+    }
+    return `${axios.defaults.baseURL}${url.startsWith('/') ? '' : '/'}${url}`;
+  };
+
   return (
     <div className="max-w-[1440px] mx-auto px-4 md:px-8 xl:px-12 py-10 animate-fade-in pb-32">
         <div className="feed-grid">
@@ -186,7 +198,7 @@ const Dashboard = () => {
                           >
                              <div className="w-full h-full rounded-2xl overflow-hidden border-2 border-white dark:border-slate-800">
                                 {user.profilePic ? (
-                                  <img src={user.profilePic} className="w-full h-full object-cover transition-transform group-hover:scale-110" />
+                                  <img src={getMediaUrl(user.profilePic)} className="w-full h-full object-cover transition-transform group-hover:scale-110" />
                                 ) : (
                                   <div className="w-full h-full bg-indigo-500 flex items-center justify-center font-bold text-2xl text-white uppercase">{user.firstName?.[0]}</div>
                                 )}
@@ -234,7 +246,7 @@ const Dashboard = () => {
                            <div key={s._id} className="flex items-center justify-between group">
                               <div className="flex items-center gap-3 cursor-pointer" onClick={() => navigate(`/profile/${s._id}`)}>
                                  <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-white/5 flex items-center justify-center text-xs font-bold text-indigo-500 uppercase overflow-hidden border border-slate-100 dark:border-white/5">
-                                    {s.profilePic ? <img src={s.profilePic} className="w-full h-full object-cover" /> : s.firstName?.[0]}
+                                    {s.profilePic ? <img src={getMediaUrl(s.profilePic)} className="w-full h-full object-cover" /> : s.firstName?.[0]}
                                  </div>
                                  <div>
                                     <p className="text-[13px] font-bold text-slate-900 dark:text-white group-hover:text-indigo-500 transition-colors uppercase tracking-tight">{s.firstName} {s.lastName?.[0]}.</p>
