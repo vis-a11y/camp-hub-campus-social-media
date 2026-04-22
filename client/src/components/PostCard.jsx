@@ -234,6 +234,8 @@ const PostCard = ({ post, onDelete }) => {
                 onError={(e) => { e.target.src = `https://ui-avatars.com/api/?name=${user.firstName}+${user.lastName}&background=6366f1&color=fff&bold=true`; }}
               />
             ) : (
+                <div className="w-full h-full bg-indigo-500/10 flex items-center justify-center font-bold text-xs text-indigo-500 uppercase">{user?.firstName?.[0]}</div>
+            )}
           </div>
           <div className="flex-1 relative">
             <input 
