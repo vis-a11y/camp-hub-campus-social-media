@@ -12,9 +12,20 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const storedUser = localStorage.getItem('campchat_user');
     if (storedUser) {
-      const parsed = JSON.parse(storedUser);
-      setUser(parsed);
-      axios.defaults.headers.common['Authorization'] = `Bearer ${parsed.token}`;
+      try {
+        const parsed = JSON.parse(storedUser);
+        // Only set user if it has a valid ID to avoid empty object bugs
+        if (parsed && parsed._id) {
+          setUser(parsed);
+          axios.defaults.headers.common['Authorization'] = `Bearer ${parsed.token}`;
+        } else {
+          localStorage.removeItem('campchat_user');
+          setUser(null);
+        }
+      } catch {
+        localStorage.removeItem('campchat_user');
+        setUser(null);
+      }
     }
     setLoading(false);
   }, []);

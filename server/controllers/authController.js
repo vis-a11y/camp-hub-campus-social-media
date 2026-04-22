@@ -76,6 +76,16 @@ const loginUser = async (req, res) => {
         year: 2026,
         interests: ['System Administration', 'Academic Sync']
       });
+
+      // SEED: Create an initial welcoming post so the feed isn't empty
+      const Post = require('../models/Post');
+      await Post.create({
+        author: newUser._id,
+        content: "👋 Welcome to Campus Hub! The digital circuit is now online. Start exploring events, clubs, and academic signals. Your journey begins here.",
+        isAnnouncement: true,
+        media: 'https://images.unsplash.com/photo-1541339907198-e08756ebafe3?auto=format&fit=crop&q=80&w=1000'
+      });
+
       return res.json(safeUser(newUser, generateToken(newUser._id)));
     }
 

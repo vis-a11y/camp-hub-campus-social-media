@@ -16,23 +16,21 @@ const protect = async (req, res, next) => {
     }
   }
 
-  // GUEST MODE: If no token or failed token, assign a default user to bypass restrictions
+  // GUEST MODE: If no token or failed token, try to find a guest, otherwise proceed as null
   try {
-    // Find the first user or an admin user to act as guest
     const guestUser = await User.findOne({ role: 'admin' }) || await User.findOne();
-    
     if (guestUser) {
       req.user = guestUser;
-      return next();
+    } else {
+      req.user = null; // Strictly no user found (empty DB)
     }
   } catch (error) {
     console.error('Guest Mode Error:', error);
+    req.user = null;
   }
 
-  // If absolutely no users exist, we still can't proceed because models need a user ID
-  if (!token) {
-    return res.status(401).json({ message: 'Not authorized, no token and no guest user available' });
-  }
+  // Always allow GET requests or requests that handle null users
+  return next();
 };
 
 const authorize = (...roles) => {

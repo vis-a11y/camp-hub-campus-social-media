@@ -98,8 +98,9 @@ const getFollowing = async (req, res) => {
 // Discover people
 const discoverPeople = async (req, res) => {
   try {
-    const { search, branch } = req.query;
-    let filter = { _id: { $ne: req.user._id } };
+    const currentId = req.user ? req.user._id : null;
+    let filter = currentId ? { _id: { $ne: currentId } } : {};
+    
     if (branch) filter.branch = branch;
     
     if (search) {
@@ -115,7 +116,7 @@ const discoverPeople = async (req, res) => {
 
     const result = users.map(u => ({
       ...u.toObject(),
-      isFollowing: u.followers.some(id => id.toString() === req.user._id.toString()),
+      isFollowing: currentId ? u.followers.some(id => id.toString() === currentId.toString()) : false,
     }));
 
     res.json(result);
@@ -131,14 +132,18 @@ const search = async (req, res) => {
     if (!q) return res.json({ users: [], posts: [] });
 
     const nameParts = q.trim().split(/\s+/);
+    const currentId = req.user ? req.user._id : null;
     let userQuery = {
       $or: [
         { firstName: { $regex: q, $options: 'i' } },
         { lastName: { $regex: q, $options: 'i' } },
         { branch: { $regex: q, $options: 'i' } }
-      ],
-      _id: { $ne: req.user._id }
+      ]
     };
+
+    if (currentId) {
+      userQuery._id = { $ne: currentId };
+    }
 
     if (nameParts.length > 1) {
        userQuery.$or.push({
