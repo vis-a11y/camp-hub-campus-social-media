@@ -5,6 +5,7 @@ import { Search, Compass, Users, TrendingUp, Zap, MessageSquare, Clock, MapPin, 
 import PostCard from '../components/PostCard';
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
+import { getMediaUrl } from '../utils/media';
 
 const ExplorePage = () => {
   const { user: currentUser } = useAuth();
@@ -119,7 +120,7 @@ const ExplorePage = () => {
                    <div key={p._id} className="flex items-center justify-between group cursor-pointer" onClick={() => navigate(`/profile/${p._id}`)}>
                       <div className="flex items-center gap-4">
                          <div className="w-12 h-12 rounded-full overflow-hidden border border-slate-200 dark:border-white/10">
-                            {p.profilePic ? <img src={p.profilePic} className="w-full h-full object-cover" /> : <div className="w-full h-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center font-bold text-sky-500 uppercase">{p.firstName?.[0]}</div>}
+                            {p.profilePic ? <img src={getMediaUrl(p.profilePic)} className="w-full h-full object-cover" /> : <div className="w-full h-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center font-bold text-sky-500 uppercase">{p.firstName?.[0]}</div>}
                          </div>
                          <div>
                             <p className="text-[14px] font-bold text-slate-900 dark:text-white lowercase">{p.firstName}_{p.lastName?.toLowerCase()}</p>
@@ -144,7 +145,7 @@ const ExplorePage = () => {
                     onClick={() => navigate(`/dashboard?post=${post._id}`)}
                    >
                        {post.media ? (
-                           <img src={post.media} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" alt="" />
+                           <img src={getMediaUrl(post.media)} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" alt="" />
                        ) : (
                            <div className="w-full h-full flex flex-col items-center justify-center p-4 text-center">
                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest line-clamp-3">{post.content}</p>

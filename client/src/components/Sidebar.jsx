@@ -6,6 +6,7 @@ import {
   Settings, Bookmark, Menu, Plus, Zap, ChevronRight
 } from 'lucide-react';
 import ThemeToggle from './ui/ThemeToggle';
+import { getMediaUrl } from '../utils/media';
 
 const Sidebar = () => {
   const navigate = useNavigate();
@@ -116,7 +117,7 @@ const Sidebar = () => {
         >
           <div className="w-10 h-10 rounded-xl overflow-hidden shadow-lg border-2 border-transparent group-hover:border-indigo-500/50 transition-all shrink-0">
              {user?.profilePic ? (
-               <img src={user.profilePic} className="w-full h-full object-cover" />
+               <img src={getMediaUrl(user.profilePic)} className="w-full h-full object-cover" />
              ) : (
                <div className="w-full h-full bg-slate-100 dark:bg-white/5 flex items-center justify-center text-indigo-500 font-bold">
                  {user ? user.firstName?.[0] : '?'}
