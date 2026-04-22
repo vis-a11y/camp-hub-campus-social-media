@@ -10,21 +10,30 @@ export const AuthProvider = ({ children }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    const verifySession = async (token) => {
+      try {
+        axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+        const { data } = await axios.get('/api/auth/me');
+        setUser(data);
+        localStorage.setItem('campchat_user', JSON.stringify(data));
+      } catch (err) {
+        console.warn('Session verification failed, reverting to guest mode');
+        logout();
+      } finally {
+        setLoading(false);
+      }
+    };
+
     const storedUser = localStorage.getItem('campchat_user');
     if (storedUser) {
       try {
         const parsed = JSON.parse(storedUser);
-        // Only set user if it has a valid ID to avoid empty object bugs
-        if (parsed && parsed._id) {
-          setUser(parsed);
-          axios.defaults.headers.common['Authorization'] = `Bearer ${parsed.token}`;
-        } else {
-          localStorage.removeItem('campchat_user');
-          setUser(null);
+        if (parsed && parsed.token) {
+          verifySession(parsed.token);
+          return;
         }
       } catch {
         localStorage.removeItem('campchat_user');
-        setUser(null);
       }
     }
     setLoading(false);

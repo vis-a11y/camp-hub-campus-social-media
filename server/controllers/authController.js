@@ -49,7 +49,8 @@ const registerUser = async (req, res) => {
       role, 
       branch: branch || 'Computer Science', 
       year: year || 2026,
-      interests: []
+      interests: [],
+      profilePic: `https://ui-avatars.com/api/?name=${firstName}+${lastName}&background=6366f1&color=fff`
     });
     
     res.status(201).json(safeUser(user, generateToken(user._id)));
