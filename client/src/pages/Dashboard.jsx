@@ -178,26 +178,38 @@ const Dashboard = () => {
               <div className="sticky top-28 space-y-8">
                  {/* Current User Card */}
                  <div className="premium-card p-6 bg-slate-50/50 dark:bg-white/5">
-                    <div className="flex items-center gap-4">
-                       <div 
-                         className="w-16 h-16 rounded-2xl campus-story-ring p-1 shadow-lg cursor-pointer group overflow-hidden" 
-                         onClick={() => navigate('/profile')}
-                       >
-                          <div className="w-full h-full rounded-2xl overflow-hidden border-2 border-white dark:border-slate-800">
-                             {user?.profilePic ? (
-                               <img src={user.profilePic} className="w-full h-full object-cover transition-transform group-hover:scale-110" />
-                             ) : (
-                               <div className="w-full h-full bg-indigo-500 flex items-center justify-center font-bold text-2xl text-white uppercase">{user?.firstName?.[0]}</div>
-                             )}
+                    {user ? (
+                       <div className="flex items-center gap-4">
+                          <div 
+                            className="w-16 h-16 rounded-2xl campus-story-ring p-1 shadow-lg cursor-pointer group overflow-hidden" 
+                            onClick={() => navigate('/profile')}
+                          >
+                             <div className="w-full h-full rounded-2xl overflow-hidden border-2 border-white dark:border-slate-800">
+                                {user.profilePic ? (
+                                  <img src={user.profilePic} className="w-full h-full object-cover transition-transform group-hover:scale-110" />
+                                ) : (
+                                  <div className="w-full h-full bg-indigo-500 flex items-center justify-center font-bold text-2xl text-white uppercase">{user.firstName?.[0]}</div>
+                                )}
+                             </div>
+                          </div>
+                          <div className="flex-1">
+                             <p className="text-[16px] font-bold text-slate-900 dark:text-white leading-tight">
+                               {user.firstName} {user.lastName}
+                             </p>
+                             <p className="text-[13px] text-slate-500 font-medium">@{user.firstName?.toLowerCase()}_{user.lastName?.toLowerCase()}</p>
                           </div>
                        </div>
-                       <div className="flex-1">
-                          <p className="text-[16px] font-bold text-slate-900 dark:text-white leading-tight">
-                            {user?.firstName} {user?.lastName}
-                          </p>
-                          <p className="text-[13px] text-slate-500 font-medium">@{user?.firstName?.toLowerCase()}_{user?.lastName?.toLowerCase()}</p>
+                    ) : (
+                       <div className="flex items-center gap-4">
+                          <div className="w-12 h-12 rounded-xl bg-slate-100 dark:bg-white/5 flex items-center justify-center text-slate-400">
+                             <Zap size={24} />
+                          </div>
+                          <div className="flex-1">
+                             <p className="text-[15px] font-bold text-slate-900 dark:text-white leading-none">Guest Explorer</p>
+                             <button onClick={() => navigate('/login')} className="text-[12px] text-indigo-500 font-bold hover:underline mt-1">Sign in to sync</button>
+                          </div>
                        </div>
-                    </div>
+                    )}
                     <div className="mt-6 pt-6 border-t border-slate-200 dark:border-white/5 flex justify-between items-center">
                        <div className="text-center flex-1 border-r border-slate-200 dark:border-white/5">
                           <p className="text-sm font-bold text-slate-900 dark:text-white">{user?.friends?.length || 0}</p>

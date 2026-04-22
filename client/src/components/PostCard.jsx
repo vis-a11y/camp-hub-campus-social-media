@@ -22,6 +22,7 @@ const PostCard = ({ post, onDelete }) => {
   const isLiked = likes.includes(user?._id);
 
   const handleLike = async () => {
+    if (!user) return toast.error('Sign in to like this post');
     try {
       const { data } = await axios.post(`/api/academic/posts/${post._id}/like`);
       setLikes(data.likes);
@@ -31,12 +32,14 @@ const PostCard = ({ post, onDelete }) => {
   };
 
   const handleDoubleTap = () => {
+    if (!user) return toast.error('Sign in to interact');
     if (!isLiked) handleLike();
     setShowHeartAnim(true);
     setTimeout(() => setShowHeartAnim(false), 800);
   };
 
   const handleSave = async () => {
+    if (!user) return toast.error('Sign in to save posts');
     try {
       const { data } = await axios.post(`/api/academic/posts/${post._id}/save`);
       setIsSaved(data.saved);
@@ -48,6 +51,7 @@ const PostCard = ({ post, onDelete }) => {
 
   const submitComment = async (e) => {
     e.preventDefault();
+    if (!user) return toast.error('Sign in to comment');
     if (!commentText.trim()) return;
     try {
       await axios.post(`/api/academic/posts/${post._id}/comment`, { text: commentText });

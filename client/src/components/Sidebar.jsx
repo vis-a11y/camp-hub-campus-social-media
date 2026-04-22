@@ -111,17 +111,27 @@ const Sidebar = () => {
         )}
 
         <button 
-          onClick={() => setShowMore(!showMore)}
+          onClick={() => user ? setShowMore(!showMore) : navigate('/login')}
           className={`w-full flex items-center gap-4 p-4 rounded-2xl transition-all duration-300 ${showMore ? 'bg-slate-100 dark:bg-white/5 shadow-inner' : 'hover:bg-slate-50 dark:hover:bg-white/5'}`}
         >
           <div className="w-10 h-10 rounded-xl overflow-hidden shadow-lg border-2 border-transparent group-hover:border-indigo-500/50 transition-all shrink-0">
-             {user?.profilePic ? <img src={user.profilePic} className="w-full h-full object-cover" /> : <div className="w-full h-full bg-indigo-500 flex items-center justify-center text-white font-bold">{user?.firstName?.[0]}</div>}
+             {user?.profilePic ? (
+               <img src={user.profilePic} className="w-full h-full object-cover" />
+             ) : (
+               <div className="w-full h-full bg-slate-100 dark:bg-white/5 flex items-center justify-center text-indigo-500 font-bold">
+                 {user ? user.firstName?.[0] : '?'}
+               </div>
+             )}
           </div>
           <div className="hidden xl:flex flex-col items-start overflow-hidden">
-             <span className="text-[14px] font-bold text-slate-900 dark:text-white truncate w-full">{user?.firstName} {user?.lastName}</span>
-             <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{user?.role || 'Active Student'}</span>
+             <span className="text-[14px] font-bold text-slate-900 dark:text-white truncate w-full">
+               {user ? `${user.firstName} ${user.lastName}` : 'Guest Node'}
+             </span>
+             <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+               {user?.role || 'Limited Access'}
+             </span>
           </div>
-          <Menu size={20} className={`ml-auto hidden xl:block transition-all ${showMore ? 'rotate-90 text-indigo-500' : 'text-slate-400'}`} />
+          {user && <Menu size={20} className={`ml-auto hidden xl:block transition-all ${showMore ? 'rotate-90 text-indigo-500' : 'text-slate-400'}`} />}
         </button>
       </div>
     </div>
