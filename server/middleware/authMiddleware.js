@@ -16,20 +16,15 @@ const protect = async (req, res, next) => {
     }
   }
 
-  // GUEST MODE: If no token or failed token, try to find a guest, otherwise proceed as null
-  try {
-    const guestUser = await User.findOne({ role: 'admin' }) || await User.findOne();
-    if (guestUser) {
-      req.user = guestUser;
-    } else {
-      req.user = null; // Strictly no user found (empty DB)
-    }
-  } catch (error) {
-    console.error('Guest Mode Error:', error);
-    req.user = null;
+  // No token found or verification failed
+  req.user = null;
+
+  // SECURITY GUARD: Allow GET requests for guests to browse public content.
+  // Block any mutations (POST, PUT, DELETE) if no valid user is attached.
+  if (req.method !== 'GET' && !token) {
+    return res.status(401).json({ message: 'Authentication required for this action.' });
   }
 
-  // Always allow GET requests or requests that handle null users
   return next();
 };
 

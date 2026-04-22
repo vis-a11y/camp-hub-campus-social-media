@@ -144,6 +144,26 @@ const Dashboard = () => {
               {/* Stories Reel Area */}
               <StoriesBar />
 
+              {/* Static Premium Post Signal Box */}
+              <div 
+                className="premium-card p-5 mb-8 flex items-center gap-4 bg-slate-50/50 dark:bg-white/5 cursor-pointer hover:border-indigo-500/50 transition-all group"
+                onClick={() => setShowCreateModal(true)}
+              >
+                 <div className="w-12 h-12 rounded-2xl overflow-hidden shadow-md border-2 border-white dark:border-slate-800">
+                    {user?.profilePic ? (
+                      <img src={getMediaUrl(user.profilePic)} className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="w-full h-full bg-indigo-500 flex items-center justify-center font-bold text-white uppercase text-lg">{user?.firstName?.[0] || '?'}</div>
+                    )}
+                 </div>
+                 <div className="flex-1 px-5 py-3 bg-white dark:bg-slate-900/40 rounded-2xl border border-slate-100 dark:border-white/5 text-slate-400 font-medium text-[13px] group-hover:text-slate-600 dark:group-hover:text-slate-200 transition-colors">
+                    Share an academic signal or thought, {user?.firstName || 'Explorer'}...
+                 </div>
+                 <div className="w-12 h-12 rounded-2xl bg-indigo-500 text-white flex items-center justify-center shadow-xl shadow-indigo-500/20 group-hover:scale-110 transition-transform active:scale-95">
+                    <PlusSquare size={22} strokeWidth={2.5} />
+                 </div>
+              </div>
+
               {/* Filtering Tabs - Modern Style */}
               <div className="flex items-center gap-8 mb-8 pb-4 border-b border-slate-200 dark:border-white/5 mx-2">
                  {[
