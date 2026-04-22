@@ -21,6 +21,20 @@ const PostCard = ({ post, onDelete }) => {
 
   const isLiked = likes.includes(user?._id);
 
+  // Normalizes media URLs to use the production API base
+  const getMediaUrl = (url) => {
+    if (!url) return '';
+    if (url.startsWith('http')) {
+      // If it's a legacy localhost URL from a previous dev session, swap it
+      if (url.includes('localhost:')) {
+        const path = url.split('/uploads/')[1];
+        return `${axios.defaults.baseURL}/uploads/${path}`;
+      }
+      return url;
+    }
+    return `${axios.defaults.baseURL}${url.startsWith('/') ? '' : '/'}${url}`;
+  };
+
   const handleLike = async () => {
     if (!user) return toast.error('Sign in to like this post');
     try {
@@ -84,7 +98,7 @@ const PostCard = ({ post, onDelete }) => {
             onClick={() => navigate(`/profile/${post.author?._id}`)}
           >
             {post.author?.profilePic ? (
-              <img src={post.author.profilePic} className="w-full h-full object-cover rounded-full bg-white dark:bg-slate-800" />
+              <img src={getMediaUrl(post.author.profilePic)} className="w-full h-full object-cover rounded-full bg-white dark:bg-slate-800" />
             ) : (
               <div className="w-full h-full bg-indigo-500 flex items-center justify-center font-bold text-white uppercase text-sm">
                 {post.author?.firstName?.[0]}
@@ -127,7 +141,7 @@ const PostCard = ({ post, onDelete }) => {
       {/* Post Image Content */}
       {post.media && (
         <div className="w-full relative bg-slate-100 dark:bg-slate-900 overflow-hidden cursor-pointer select-none border-b border-slate-100 dark:border-white/5" onDoubleClick={handleDoubleTap}>
-           <img src={post.media} alt="" className="w-full object-contain max-h-[600px] mx-auto transition-transform duration-500 group-hover:scale-[1.01]" />
+           <img src={getMediaUrl(post.media)} alt="" className="w-full object-contain max-h-[600px] mx-auto transition-transform duration-500 group-hover:scale-[1.01]" />
            {showHeartAnim && (
               <div className="absolute inset-0 flex items-center justify-center animate-heart-scale pointer-events-none z-10">
                  <Heart size={100} className="fill-white text-white drop-shadow-2xl opacity-90" />
@@ -141,7 +155,7 @@ const PostCard = ({ post, onDelete }) => {
              >
                 <div className={`w-2 h-2 rounded-full bg-emerald-500 ${isPlaying ? 'animate-pulse' : ''}`}></div>
                 <span className="text-[10px] font-bold text-white uppercase tracking-widest">{post.music.title} — {post.music.artist}</span>
-                <audio ref={audioRef} src={post.music.audioUrl} loop hidden />
+                <audio ref={audioRef} src={getMediaUrl(post.music.audioUrl)} loop hidden />
              </div>
            )}
 
@@ -201,13 +215,17 @@ const PostCard = ({ post, onDelete }) => {
               <div className="max-h-60 overflow-y-auto pr-2 no-scrollbar">
                 {post.comments?.map((c, i) => (
                    <div key={i} className="flex gap-3 mb-4 last:mb-0 group/comment">
-                      <div className="w-8 h-8 rounded-full bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center text-[10px] font-bold text-indigo-500 uppercase">
-                        {c.author?.firstName?.[0] || 'U'}
+                      <div className="w-8 h-8 rounded-full bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center border border-slate-200 dark:border-white/10 overflow-hidden">
+                        {c.user?.profilePic ? (
+                          <img src={getMediaUrl(c.user.profilePic)} className="w-full h-full object-cover" />
+                        ) : (
+                          <span className="text-[10px] font-bold text-indigo-500 uppercase">{c.user?.firstName?.[0] || 'U'}</span>
+                        )}
                       </div>
                       <div className="flex-1 bg-slate-50 dark:bg-white/5 p-3 rounded-2xl rounded-tl-none">
                         <div className="flex justify-between items-center mb-1">
-                          <span className="font-bold text-xs text-slate-900 dark:text-white">
-                            {c.author?.firstName || 'user'}_
+                          <span className="font-bold text-xs text-slate-900 dark:text-white lowercase">
+                            {c.user?.firstName || 'user'}_{c.user?.lastName?.toLowerCase() || ''}
                           </span>
                         </div>
                         <p className="text-sm text-slate-600 dark:text-slate-300">{c.text}</p>
