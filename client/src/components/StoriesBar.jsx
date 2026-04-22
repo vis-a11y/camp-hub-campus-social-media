@@ -101,8 +101,12 @@ const StoriesBar = () => {
         >
           <div className="w-[74px] h-[74px] rounded-full p-[3px] bg-slate-200 dark:bg-white/10 group-hover:scale-105 transition-all duration-300">
             <div className="w-full h-full rounded-full border-2 border-white dark:border-slate-900 bg-slate-100 dark:bg-slate-800 flex items-center justify-center overflow-hidden">
-               {user?.profilePic ? (
-                 <img src={getMediaUrl(user.profilePic)} className="w-full h-full object-cover" />
+                {user?.profilePic ? (
+                  <img 
+                    src={getMediaUrl(user.profilePic)} 
+                    className="w-full h-full object-cover" 
+                    onError={(e) => { e.target.src = `https://ui-avatars.com/api/?name=${user.firstName}+${user.lastName}&background=6366f1&color=fff&bold=true`; }}
+                  />
                ) : (
                  <div className="text-sm font-bold text-indigo-500 uppercase">
                     {user ? user.firstName?.[0] : <User size={20} />}
@@ -130,7 +134,12 @@ const StoriesBar = () => {
           <div className={`w-[74px] h-[74px] rounded-full flex items-center justify-center p-[3.5px] ${group.hasUnseen ? 'accent-gradient-bg shadow-lg shadow-indigo-500/20' : 'bg-slate-200 dark:bg-white/10'}`}>
             <div className="w-full h-full rounded-full border-2 border-white dark:border-slate-900 overflow-hidden bg-white dark:bg-slate-800">
               {group.author?.profilePic 
-                ? <img src={getMediaUrl(group.author.profilePic)} alt="" className="w-full h-full object-cover rounded-full" />
+                ? <img 
+                    src={getMediaUrl(group.author.profilePic)} 
+                    alt="" 
+                    className="w-full h-full object-cover rounded-full" 
+                    onError={(e) => { e.target.src = `https://ui-avatars.com/api/?name=${group.author?.firstName}+${group.author?.lastName}&background=6366f1&color=fff&bold=true`; }}
+                  />
                 : <div className="w-full h-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-lg font-bold text-indigo-500 uppercase">{group.author?.firstName?.[0]}</div>}
             </div>
           </div>

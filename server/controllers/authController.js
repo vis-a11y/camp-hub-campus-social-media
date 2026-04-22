@@ -62,34 +62,6 @@ const registerUser = async (req, res) => {
 const loginUser = async (req, res) => {
   const { email, password } = req.body;
   try {
-    const userCount = await User.countDocuments();
-    if (userCount === 0) {
-      console.log('🚀 Initializing first user with provided credentials...');
-      const salt = await bcrypt.genSalt(10);
-      const hashedPassword = await bcrypt.hash(password, salt);
-      const newUser = await User.create({
-        firstName: 'System',
-        lastName: 'Admin',
-        email: email, 
-        password: hashedPassword, 
-        role: 'admin',
-        branch: 'Administration',
-        year: 2026,
-        interests: ['System Administration', 'Academic Sync']
-      });
-
-      // SEED: Create an initial welcoming post so the feed isn't empty
-      const Post = require('../models/Post');
-      await Post.create({
-        author: newUser._id,
-        content: "👋 Welcome to Campus Hub! The digital circuit is now online. Start exploring events, clubs, and academic signals. Your journey begins here.",
-        isAnnouncement: true,
-        media: 'https://images.unsplash.com/photo-1541339907198-e08756ebafe3?auto=format&fit=crop&q=80&w=1000'
-      });
-
-      return res.json(safeUser(newUser, generateToken(newUser._id)));
-    }
-
     const user = await User.findOne({ email });
     if (user && (await bcrypt.compare(password, user.password))) {
       res.json(safeUser(user, generateToken(user._id)));

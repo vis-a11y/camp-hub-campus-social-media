@@ -209,7 +209,11 @@ const Dashboard = () => {
                           >
                              <div className="w-full h-full rounded-2xl overflow-hidden border-2 border-white dark:border-slate-800">
                                 {user.profilePic ? (
-                                  <img src={getMediaUrl(user.profilePic)} className="w-full h-full object-cover transition-transform group-hover:scale-110" />
+                                  <img 
+                                    src={getMediaUrl(user.profilePic)} 
+                                    className="w-full h-full object-cover transition-transform group-hover:scale-110" 
+                                    onError={(e) => { e.target.src = `https://ui-avatars.com/api/?name=${user.firstName}+${user.lastName}&background=6366f1&color=fff&bold=true`; }}
+                                  />
                                 ) : (
                                   <div className="w-full h-full bg-indigo-500 flex items-center justify-center font-bold text-2xl text-white uppercase">{user.firstName?.[0]}</div>
                                 )}

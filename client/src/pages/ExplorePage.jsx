@@ -12,6 +12,9 @@ const ExplorePage = () => {
   const navigate = useNavigate();
   const [people, setPeople] = useState([]);
   const [posts, setPosts] = useState([]);
+  // PRODUCTION FAILSAFE: Use hardcoded Render domain if detection fails
+  const apiBase = import.meta.env.VITE_API_BASE_URL || axios.defaults.baseURL || 'https://campchat-campus-hub-2.onrender.com';
+  const baseUrl = apiBase.replace(/\/$/, ''); 
   const [activeTab, setActiveTab] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
@@ -145,7 +148,12 @@ const ExplorePage = () => {
                     onClick={() => navigate(`/dashboard?post=${post._id}`)}
                    >
                        {post.media ? (
-                           <img src={getMediaUrl(post.media)} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" alt="" />
+                           <img 
+                                src={getMediaUrl(post.media)} 
+                                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" 
+                                alt="" 
+                                onError={(e) => { e.target.src = 'https://images.unsplash.com/photo-1541339907198-e08756ebafe3?auto=format&fit=crop&q=80&w=1000'; }}
+                            />
                        ) : (
                            <div className="w-full h-full flex flex-col items-center justify-center p-4 text-center">
                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest line-clamp-3">{post.content}</p>
