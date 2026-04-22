@@ -125,17 +125,6 @@ const Dashboard = () => {
     }
   };
 
-  const getMediaUrl = (url) => {
-    if (!url) return '';
-    if (url.startsWith('http')) {
-      if (url.includes('localhost:')) {
-        const path = url.split('/uploads/')[1];
-        return `${axios.defaults.baseURL}/uploads/${path}`;
-      }
-      return url;
-    }
-    return `${axios.defaults.baseURL}${url.startsWith('/') ? '' : '/'}${url}`;
-  };
 
   return (
     <>
