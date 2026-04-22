@@ -10,7 +10,7 @@ import axios from 'axios';
 import toast from 'react-hot-toast';
 import { useLocation } from 'react-router-dom';
 
-const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || 'http://localhost:5001';
+const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || 'https://campchat-campus-hub-2.onrender.com';
 const socket = io(SOCKET_URL, { 
   autoConnect: false,
   transports: ['websocket', 'polling'], // Ensure both are tried

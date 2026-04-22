@@ -21,7 +21,7 @@ import axios from 'axios';
 
 // POINTED TO REAL-TIME BACKEND
 // In development, we use the Vite proxy. In production, we MUST use the VITE_API_BASE_URL set in Vercel settings.
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://campchat-campus-hub-2.onrender.com';
 axios.defaults.baseURL = API_BASE_URL;
 
 if (import.meta.env.DEV) {
