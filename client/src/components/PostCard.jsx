@@ -227,7 +227,13 @@ const PostCard = ({ post, onDelete }) => {
       <div className="px-5 py-4 bg-slate-50/50 dark:bg-white/5 border-t border-slate-100 dark:border-white/5">
         <form onSubmit={submitComment} className="flex items-center gap-3">
           <div className="w-8 h-8 rounded-full overflow-hidden hidden sm:block">
-            {user?.profilePic ? <img src={getMediaUrl(user.profilePic)} className="w-full h-full object-cover" /> : <div className="w-full h-full bg-indigo-500/10 flex items-center justify-center font-bold text-xs text-indigo-500 uppercase">{user?.firstName?.[0]}</div>}
+            {user?.profilePic ? (
+              <img 
+                src={getMediaUrl(user.profilePic)} 
+                className="w-full h-full object-cover" 
+                onError={(e) => { e.target.src = `https://ui-avatars.com/api/?name=${user.firstName}+${user.lastName}&background=6366f1&color=fff&bold=true`; }}
+              />
+            ) : (
           </div>
           <div className="flex-1 relative">
             <input 

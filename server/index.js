@@ -62,7 +62,8 @@ const upload = multer({ storage });
 
 // Middleware
 app.use(helmet({
-  crossOriginResourcePolicy: { policy: "cross-origin" }, // Allows images from other origins (like your uploads)
+  crossOriginResourcePolicy: { policy: "cross-origin" },
+  contentSecurityPolicy: false, // Disable CSP to allow all external media sources reliably
 }));
 app.use(compression()); // Compress responses
 
