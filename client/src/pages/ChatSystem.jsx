@@ -9,6 +9,8 @@ import io from 'socket.io-client';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { useLocation } from 'react-router-dom';
+import { getMediaUrl } from '../utils/media';
+import CallOverlay from '../components/CallOverlay';
 
 const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || 'https://campchat-campus-hub-2.onrender.com';
 const socket = io(SOCKET_URL, { 
@@ -29,6 +31,9 @@ const ChatSystem = () => {
   const [searchResults, setSearchResults] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
   const [activeTab, setActiveTab] = useState('Primary'); 
+  const [activeCall, setActiveCall] = useState(false);
+  const [callType, setCallType] = useState('audio');
+  const [callContact, setCallContact] = useState(null);
   const scrollRef = useRef();
 
   useEffect(() => {
@@ -147,6 +152,20 @@ const ChatSystem = () => {
      }
   };
 
+  const handleStartCall = (type) => {
+     const otherUser = activeChat.users.find(u => u._id !== user?._id);
+     setCallContact(otherUser);
+     setCallType(type);
+     setActiveCall(true);
+     toast.success(`Establishing ${type} node connection...`);
+  };
+
+  const handleEndCall = () => {
+     setActiveCall(false);
+     setCallContact(null);
+     toast.error('Connection Terminated');
+  };
+
   const filteredChats = chats.filter(c => {
     const otherUser = c.users.find(u => u._id !== user?._id);
     return `${otherUser?.firstName} ${otherUser?.lastName}`.toLowerCase().includes(searchQuery.toLowerCase());
@@ -201,7 +220,7 @@ const ChatSystem = () => {
                     searchResults.map(u => (
                        <div key={u._id} onClick={() => accessChat(u._id)} className="flex items-center gap-3 p-3 hover:bg-slate-50 dark:hover:bg-white/5 rounded-xl cursor-pointer transition-all">
                           <div className="w-11 h-11 rounded-full overflow-hidden border border-slate-200 dark:border-white/10">
-                             {u.profilePic ? <img src={u.profilePic} className="w-full h-full object-cover" /> : <div className="w-full h-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center font-bold text-sky-500 uppercase">{u.firstName?.[0]}</div>}
+                             {u.profilePic ? <img src={getMediaUrl(u.profilePic)} className="w-full h-full object-cover" /> : <div className="w-full h-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center font-bold text-sky-500 uppercase">{u.firstName?.[0]}</div>}
                           </div>
                           <div>
                              <p className="text-[14px] font-bold text-slate-900 dark:text-white lowercase">{u.firstName}_{u.lastName?.toLowerCase()}</p>
@@ -230,7 +249,7 @@ const ChatSystem = () => {
                     >
                        <div className="w-14 h-14 rounded-full border-2 border-slate-200 dark:border-white/10 p-0.5 relative">
                           {otherUser?.profilePic ? (
-                            <img src={otherUser.profilePic} className="w-full h-full object-cover rounded-full" />
+                            <img src={getMediaUrl(otherUser.profilePic)} className="w-full h-full object-cover rounded-full" />
                           ) : (
                             <div className="w-full h-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center font-bold text-sky-500 rounded-full uppercase italic">{otherUser?.firstName?.[0]}</div>
                           )}
@@ -258,7 +277,7 @@ const ChatSystem = () => {
                <div className="flex items-center gap-3">
                   <button onClick={() => setActiveChat(null)} className="md:hidden mr-2 hover:opacity-50 transition-all"><ChevronLeft size={24} /></button>
                   <div className="w-10 h-10 rounded-full border border-slate-100 dark:border-white/10 overflow-hidden shrink-0">
-                     {activeChat.users.find(u => u._id !== user?._id)?.profilePic ? <img src={activeChat.users.find(u => u._id !== user?._id).profilePic} className="w-full h-full object-cover" /> : <div className="w-full h-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center font-bold text-sky-500 uppercase">{activeChat.users.find(u => u._id !== user?._id)?.firstName?.[0]}</div>}
+                     {activeChat.users.find(u => u._id !== user?._id)?.profilePic ? <img src={getMediaUrl(activeChat.users.find(u => u._id !== user?._id).profilePic)} className="w-full h-full object-cover" /> : <div className="w-full h-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center font-bold text-sky-500 uppercase">{activeChat.users.find(u => u._id !== user?._id)?.firstName?.[0]}</div>}
                   </div>
                   <div className="flex flex-col">
                      <p className="text-[14px] font-bold leading-none lowercase">{activeChat.users.find(u => u._id !== user?._id)?.firstName}_{activeChat.users.find(u => u._id !== user?._id)?.lastName?.toLowerCase()}</p>
@@ -266,8 +285,16 @@ const ChatSystem = () => {
                   </div>
                </div>
                <div className="flex gap-4">
-                  <Phone size={22} className="cursor-pointer hover:opacity-50" />
-                  <Video size={22} className="cursor-pointer hover:opacity-50" />
+                  <Phone 
+                    size={22} 
+                    className="cursor-pointer hover:text-indigo-500 transition-colors" 
+                    onClick={() => handleStartCall('audio')}
+                  />
+                  <Video 
+                    size={22} 
+                    className="cursor-pointer hover:text-indigo-500 transition-colors" 
+                    onClick={() => handleStartCall('video')}
+                  />
                   <Info size={22} className="cursor-pointer hover:opacity-50" />
                </div>
             </div>
@@ -280,7 +307,7 @@ const ChatSystem = () => {
                        <div className="flex items-end gap-2 max-w-[70%] relative">
                           {!isOwn && (
                              <div className="w-7 h-7 rounded-full overflow-hidden border border-slate-100 dark:border-white/5 mb-1 shrink-0">
-                                {m.sender?.profilePic ? <img src={m.sender.profilePic} className="w-full h-full object-cover" /> : <div className="w-full h-full bg-slate-50 flex items-center justify-center text-[10px] font-bold text-sky-500">{m.sender?.firstName?.[0]}</div>}
+                                {m.sender?.profilePic ? <img src={getMediaUrl(m.sender.profilePic)} className="w-full h-full object-cover" /> : <div className="w-full h-full bg-slate-50 flex items-center justify-center text-[10px] font-bold text-sky-500">{m.sender?.firstName?.[0]}</div>}
                              </div>
                           )}
                           <div 
@@ -330,6 +357,13 @@ const ChatSystem = () => {
           </div>
         )}
       </div>
+      {/* Call System Overlay */}
+      <CallOverlay 
+         isOpen={activeCall}
+         type={callType}
+         contact={callContact}
+         onEndCall={handleEndCall}
+      />
     </div>
   );
 };
