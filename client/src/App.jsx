@@ -20,14 +20,26 @@ import { Toaster } from 'react-hot-toast';
 import axios from 'axios';
 
 // POINTED TO REAL-TIME BACKEND
-// In development, we use the Vite proxy. In production, we MUST use the VITE_API_BASE_URL set in Vercel settings.
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://campchat-campus-hub-2.onrender.com';
 axios.defaults.baseURL = API_BASE_URL;
 
+// Global Response Interceptor
+axios.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      console.warn('Session expired or unauthorized');
+      // We don't force logout/redirect here because of Guest Mode
+    }
+    if (!error.response) {
+      toast.error('Network Error: Connectivity with Hub lost', { id: 'network-err' });
+    }
+    return Promise.reject(error);
+  }
+);
+
 if (import.meta.env.DEV) {
-  console.log('🚀 API Base URL:', API_BASE_URL || 'Local Proxy');
-} else if (!API_BASE_URL) {
-  console.warn('⚠️ VITE_API_BASE_URL is not set! API calls may fail in production.');
+  console.log('🚀 API Base URL:', API_BASE_URL);
 }
 
 const ProtectedRoute = ({ children }) => {

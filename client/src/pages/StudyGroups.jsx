@@ -129,6 +129,7 @@ const StudyGroups = () => {
          </div>
          <button 
            onClick={() => {
+              if (!user) return navigate('/login');
               if (!canAccessCreation) {
                 return toast.error('Creation restricted to Faculty Nodes', {
                     style: { borderRadius: '12px', background: '#000', color: '#fff', fontSize: '11px', fontWeight: '700' }
@@ -139,7 +140,7 @@ const StudyGroups = () => {
            }}
            className="bg-slate-900 dark:bg-white text-white dark:text-black px-8 py-3 rounded-xl text-[14px] font-bold tracking-tight hover:opacity-80 transition-all shadow-md active:scale-95"
          >
-            <PlusSquare size={20} strokeWidth={2.5} className="inline mr-3" /> {canAccessCreation ? `Create ${activeTab === 'clubs' ? 'Club' : 'Committee'}` : 'Module Restricted'}
+            <PlusSquare size={20} strokeWidth={2.5} className="inline mr-3" /> {user ? (canAccessCreation ? `Create ${activeTab === 'clubs' ? 'Club' : 'Committee'}` : 'Module Restricted') : 'Join to Create'}
          </button>
       </div>
 
@@ -201,7 +202,7 @@ const StudyGroups = () => {
                             <p className="text-[13px] font-bold text-slate-900 dark:text-white lowercase">{club.members?.length || 0} nodes followed</p>
                             <h3 className="text-[15px] font-bold text-slate-900 dark:text-white tracking-tight uppercase leading-tight group-hover:text-sky-500 transition-colors truncate">{club.name}</h3>
                             <button 
-                              onClick={() => handleJoinClub(club._id)}
+                              onClick={() => user ? handleJoinClub(club._id) : navigate('/login')}
                               className={`w-full py-2 rounded-lg font-bold text-sm uppercase tracking-widest transition-all italic border ${
                                 club.members?.includes(user?._id) 
                                 ? 'bg-slate-50 dark:bg-white/5 text-slate-400 border-slate-200 dark:border-white/10' 

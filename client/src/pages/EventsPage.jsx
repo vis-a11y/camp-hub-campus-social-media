@@ -133,6 +133,7 @@ const EventsPage = () => {
          </div>
          <button 
            onClick={() => {
+              if (!user) return navigate('/login');
               if (!canCreate) {
                  return toast.error('Creation module restricted to Faculty Nodes');
               }
@@ -141,7 +142,7 @@ const EventsPage = () => {
            className="premium-button py-4 px-10 text-sm uppercase tracking-[0.2em] shadow-2xl shadow-indigo-500/20 group flex items-center gap-3"
          >
             <Plus size={20} className="group-hover:rotate-90 transition-transform" />
-            {canCreate ? 'Organize Event' : 'Access Restricted'}
+            {user ? (canCreate ? 'Organize Event' : 'Access Restricted') : 'Join to Organize'}
          </button>
       </div>
 
@@ -231,7 +232,7 @@ const EventsPage = () => {
 
                       {!canCreate && (
                          <button 
-                            onClick={(e) => { e.stopPropagation(); handleRegister(event._id); }}
+                            onClick={(e) => { e.stopPropagation(); user ? handleRegister(event._id) : navigate('/login'); }}
                             disabled={event.registrations?.includes(user?._id)}
                             className={`w-full py-4 text-[11px] font-bold tracking-[0.2em] transition-all uppercase rounded-2xl shadow-xl active:scale-95 ${
                                event.registrations?.includes(user?._id)
@@ -458,7 +459,7 @@ const EventsPage = () => {
 
                   {!canCreate && (
                      <button 
-                        onClick={() => handleRegister(selectedEvent._id)}
+                        onClick={() => user ? handleRegister(selectedEvent._id) : navigate('/login')}
                         disabled={selectedEvent.registrations?.includes(user?._id)}
                         className={`w-full py-5 rounded-2xl text-[12px] font-bold tracking-[0.2em] transition-all uppercase shadow-2xl ${
                            selectedEvent.registrations?.includes(user?._id)

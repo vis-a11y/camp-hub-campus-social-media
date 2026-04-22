@@ -1,12 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
-import { Plus, X, ChevronLeft, ChevronRight, Send, Camera, Image, Activity } from 'lucide-react';
+import { Plus, X, ChevronLeft, ChevronRight, Send, Camera, Image, Activity, User } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import toast from 'react-hot-toast';
+import { useNavigate } from 'react-router-dom';
 
 const StoriesBar = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [stories, setStories] = useState([]);
   const [selectedMusic, setSelectedMusic] = useState(null);
   const [showMusicPicker, setShowMusicPicker] = useState(false);
@@ -94,14 +96,16 @@ const StoriesBar = () => {
       <div className="flex flex-col items-center gap-2 flex-shrink-0 group">
         <div 
           className="relative cursor-pointer" 
-          onClick={() => fileInputRef.current.click()}
+          onClick={() => user ? fileInputRef.current.click() : navigate('/login')}
         >
           <div className="w-[74px] h-[74px] rounded-full p-[3px] bg-slate-200 dark:bg-white/10 group-hover:scale-105 transition-all duration-300">
             <div className="w-full h-full rounded-full border-2 border-white dark:border-slate-900 bg-slate-100 dark:bg-slate-800 flex items-center justify-center overflow-hidden">
                {user?.profilePic ? (
                  <img src={user.profilePic} className="w-full h-full object-cover" />
                ) : (
-                 <div className="text-sm font-bold text-indigo-500 uppercase">{user?.firstName?.[0]}</div>
+                 <div className="text-sm font-bold text-indigo-500 uppercase">
+                    {user ? user.firstName?.[0] : <User size={20} />}
+                 </div>
                )}
             </div>
           </div>
@@ -110,7 +114,9 @@ const StoriesBar = () => {
           </div>
           <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handleCreateStory} disabled={isUploading} />
         </div>
-        <span className="text-[12px] text-slate-500 dark:text-slate-400 font-semibold tracking-tight">Your Story</span>
+        <span className="text-[12px] text-slate-500 dark:text-slate-400 font-semibold tracking-tight">
+           {user ? 'Your Story' : 'Join the Hub'}
+        </span>
       </div>
 
       {/* Stories List */}

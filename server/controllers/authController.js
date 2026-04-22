@@ -10,7 +10,7 @@ const safeUser = (user, token) => ({
   _id: user._id,
   firstName: user.firstName,
   lastName: user.lastName,
-  name: `${user.firstName} ${user.lastName}`, // Virtualized for UI mapping
+  name: `${user.firstName} ${user.lastName}`, 
   email: user.email,
   role: user.role,
   branch: user.branch,
@@ -22,6 +22,9 @@ const safeUser = (user, token) => ({
   followers: user.followers,
   following: user.following,
   isVerified: user.isVerified,
+  interests: user.interests || [],
+  website: user.website,
+  location: user.location,
   createdAt: user.createdAt,
   token,
 });
@@ -45,7 +48,8 @@ const registerUser = async (req, res) => {
       password: hashedPassword, 
       role, 
       branch: branch || 'Computer Science', 
-      year: year || 2026 
+      year: year || 2026,
+      interests: []
     });
     
     res.status(201).json(safeUser(user, generateToken(user._id)));
@@ -57,7 +61,6 @@ const registerUser = async (req, res) => {
 const loginUser = async (req, res) => {
   const { email, password } = req.body;
   try {
-    // Check if database is empty - if so, create the first user with provided credentials
     const userCount = await User.countDocuments();
     if (userCount === 0) {
       console.log('🚀 Initializing first user with provided credentials...');
@@ -66,11 +69,12 @@ const loginUser = async (req, res) => {
       const newUser = await User.create({
         firstName: 'System',
         lastName: 'Admin',
-        email: email, // Use whatever email they entered
-        password: hashedPassword, // Use whatever password they entered
+        email: email, 
+        password: hashedPassword, 
         role: 'admin',
         branch: 'Administration',
-        year: 2026
+        year: 2026,
+        interests: ['System Administration', 'Academic Sync']
       });
       return res.json(safeUser(newUser, generateToken(newUser._id)));
     }
@@ -98,10 +102,10 @@ const getUserProfile = async (req, res) => {
 
 const updateUserProfile = async (req, res) => {
   try {
-    const { firstName, lastName, bio, branch, year, profilePic, coverPhoto, website, location } = req.body;
+    const { firstName, lastName, bio, branch, year, profilePic, coverPhoto, website, location, interests } = req.body;
     const user = await User.findByIdAndUpdate(
       req.user._id,
-      { firstName, lastName, bio, branch, year, profilePic, coverPhoto, website, location, updatedAt: Date.now() },
+      { firstName, lastName, bio, branch, year, profilePic, coverPhoto, website, location, interests, updatedAt: Date.now() },
       { new: true, runValidators: true }
     );
     res.json(safeUser(user, req.headers.authorization?.split(' ')[1]));
