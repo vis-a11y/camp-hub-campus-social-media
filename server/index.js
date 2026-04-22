@@ -49,16 +49,32 @@ app.use(compression()); // Compress responses
 
 const corsOptions = {
   origin: (origin, callback) => {
-    const allowed = [process.env.CLIENT_URL, 'http://localhost:5173', 'http://localhost:3000'].filter(Boolean);
-    if (!origin || allowed.includes(origin) || allowed.length === 0 || !process.env.NODE_ENV || process.env.NODE_ENV === 'development') {
+    // Add Vercel and localhost origins
+    const allowedOrigins = [
+      process.env.CLIENT_URL,
+      'http://localhost:5173',
+      'http://localhost:3000',
+    ].filter(Boolean);
+
+    // Allow requests with no origin (like mobile apps or curl)
+    if (!origin) return callback(null, true);
+
+    // Check if origin is allowed, or if it's a Vercel preview/production URL
+    const isAllowed = allowedOrigins.some(url => origin.startsWith(url)) || 
+                      origin.endsWith('.vercel.app') ||
+                      process.env.NODE_ENV !== 'production';
+
+    if (isAllowed) {
       callback(null, true);
     } else {
+      console.warn('🛑 CORS Blocked Origin:', origin);
+      console.warn('💡 Tip: Add this origin to your CLIENT_URL or the allowed list.');
       callback(new Error('Not allowed by CORS'));
     }
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept'],
   optionsSuccessStatus: 200,
 };
 app.use(cors(corsOptions));

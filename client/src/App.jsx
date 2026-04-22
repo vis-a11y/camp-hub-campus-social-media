@@ -21,11 +21,19 @@ import axios from 'axios';
 
 // POINTED TO REAL-TIME BACKEND
 // In development, we use the Vite proxy. In production, we MUST use the VITE_API_BASE_URL set in Vercel settings.
-axios.defaults.baseURL = import.meta.env.VITE_API_BASE_URL || '/'; 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
+axios.defaults.baseURL = API_BASE_URL;
+
+if (import.meta.env.DEV) {
+  console.log('🚀 API Base URL:', API_BASE_URL || 'Local Proxy');
+} else if (!API_BASE_URL) {
+  console.warn('⚠️ VITE_API_BASE_URL is not set! API calls may fail in production.');
+}
 
 const ProtectedRoute = ({ children }) => {
-  const { user } = useAuth();
-  return user ? children : <Navigate to="/login" />;
+  // RESTRICTIONS REMOVED: All routes are now public.
+  // We still provide the user context if available, otherwise features work in guest mode.
+  return children; 
 };
 
 function AppRoutes() {

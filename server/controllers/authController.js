@@ -57,6 +57,24 @@ const registerUser = async (req, res) => {
 const loginUser = async (req, res) => {
   const { email, password } = req.body;
   try {
+    // Check if database is empty - if so, create the first user with provided credentials
+    const userCount = await User.countDocuments();
+    if (userCount === 0) {
+      console.log('🚀 Initializing first user with provided credentials...');
+      const salt = await bcrypt.genSalt(10);
+      const hashedPassword = await bcrypt.hash(password, salt);
+      const newUser = await User.create({
+        firstName: 'System',
+        lastName: 'Admin',
+        email: email, // Use whatever email they entered
+        password: hashedPassword, // Use whatever password they entered
+        role: 'admin',
+        branch: 'Administration',
+        year: 2026
+      });
+      return res.json(safeUser(newUser, generateToken(newUser._id)));
+    }
+
     const user = await User.findOne({ email });
     if (user && (await bcrypt.compare(password, user.password))) {
       res.json(safeUser(user, generateToken(user._id)));
