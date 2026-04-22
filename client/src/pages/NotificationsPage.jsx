@@ -8,6 +8,7 @@ import {
 import { formatDistanceToNow, isToday, isYesterday, isThisWeek } from 'date-fns';
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
+import { getMediaUrl } from '../utils/media';
 
 const NotificationsPage = () => {
   const { user } = useAuth();
@@ -63,9 +64,13 @@ const NotificationsPage = () => {
     <div className="flex items-center justify-between gap-4 py-3 group animate-fade-in relative z-10 px-4 hover:bg-slate-50 dark:hover:bg-white/5 transition-colors cursor-pointer" onClick={() => n.post && navigate(`/dashboard?post=${n.post}`)}>
       <div className="flex items-center gap-4 flex-1">
         <div className="relative shrink-0" onClick={(e) => { e.stopPropagation(); navigate(`/profile/${n.sender?._id}`); }}>
-          <div className="w-11 h-11 rounded-full overflow-hidden border border-slate-200 dark:border-white/10">
+          <div className="w-11 h-11 rounded-full overflow-hidden border border-slate-200 dark:border-white/10 flex items-center justify-center">
              {n.sender?.profilePic ? (
-               <img src={n.sender.profilePic} alt="" className="w-full h-full object-cover" />
+               <img 
+                 src={getMediaUrl(n.sender.profilePic)} 
+                 className="w-full h-full object-cover" 
+                 onError={(e) => { e.target.src = `https://ui-avatars.com/api/?name=${n.sender.firstName}+${n.sender.lastName}&background=6366f1&color=fff&bold=true`; }}
+               />
              ) : (
                <div className="w-full h-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center font-bold text-sky-500 uppercase">{n.sender?.firstName?.[0]}</div>
              )}
@@ -88,8 +93,13 @@ const NotificationsPage = () => {
       {n.type === 'follow' ? (
         <button className="bg-sky-500 text-white rounded-lg px-4 py-1.5 text-[13px] font-bold hover:opacity-80 transition-all shrink-0">Follow</button>
       ) : n.postImage ? (
-        <div className="w-11 h-11 rounded-sm overflow-hidden bg-slate-100 dark:bg-white/10 shrink-0">
-           <img src={n.postImage} className="w-full h-full object-cover" alt="" />
+        <div className="w-11 h-11 rounded-sm overflow-hidden bg-slate-100 dark:bg-white/10 shrink-0 border border-slate-100 dark:border-white/5">
+           <img 
+             src={getMediaUrl(n.postImage)} 
+             className="w-full h-full object-cover" 
+             alt="" 
+             onError={(e) => { e.target.src = 'https://images.unsplash.com/photo-1541339907198-e08756ebafe3?auto=format&fit=crop&q=80&w=100'; }}
+           />
         </div>
       ) : (
         <button onClick={(e) => { e.stopPropagation(); deleteNotification(n._id); }} className="p-2 text-slate-300 hover:text-rose-500 opacity-0 group-hover:opacity-100"><X size={18} /></button>

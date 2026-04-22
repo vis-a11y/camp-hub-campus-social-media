@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { X, Mic, MicOff, Video, VideoOff, PhoneOff, Maximize2, Minimize2, Camera, RefreshCcw, Smile, MoreVertical } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { getMediaUrl } from '../utils/media';
 
 const CallOverlay = ({ isOpen, type, contact, onEndCall }) => {
   const [isMuted, setIsMuted] = useState(false);
@@ -48,8 +49,17 @@ const CallOverlay = ({ isOpen, type, contact, onEndCall }) => {
         {/* Dynamic Header */}
         <div className={`absolute top-0 left-0 right-0 p-8 flex justify-between items-start z-10 ${isMinimized ? 'p-4' : ''}`}>
            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-2xl overflow-hidden border-2 border-white/20 shadow-xl">
-                 <img src={contact?.profilePic || 'https://via.placeholder.com/150'} className="w-full h-full object-cover" alt="" />
+              <div className="w-12 h-12 rounded-2xl overflow-hidden border-2 border-white/20 shadow-xl flex items-center justify-center">
+                 {contact?.profilePic ? (
+                   <img 
+                     src={getMediaUrl(contact.profilePic)} 
+                     className="w-full h-full object-cover" 
+                     alt="" 
+                     onError={(e) => { e.target.src = `https://ui-avatars.com/api/?name=${contact.firstName}+${contact.lastName}&background=6366f1&color=fff&bold=true`; }}
+                   />
+                 ) : (
+                   <div className="w-full h-full bg-slate-800 flex items-center justify-center text-sky-500 font-bold">{contact?.firstName?.[0]}</div>
+                 )}
               </div>
               <div className={isMinimized ? 'hidden' : 'block'}>
                  <h2 className="text-white font-bold text-xl lowercase">{contact?.firstName}_{contact?.lastName?.toLowerCase()}</h2>
@@ -72,8 +82,17 @@ const CallOverlay = ({ isOpen, type, contact, onEndCall }) => {
            <div className="relative flex flex-col items-center gap-8 mt-20">
               {/* Profile Orb */}
               <div className="relative group">
-                 <div className="w-48 h-48 sm:w-64 sm:h-64 rounded-[40px] overflow-hidden border-4 border-indigo-500/30 shadow-3xl transform group-hover:scale-105 transition-transform duration-700">
-                    <img src={contact?.profilePic || 'https://via.placeholder.com/150'} className="w-full h-full object-cover" alt="" />
+                 <div className="w-48 h-48 sm:w-64 sm:h-64 rounded-[40px] overflow-hidden border-4 border-indigo-500/30 shadow-3xl transform group-hover:scale-105 transition-transform duration-700 flex items-center justify-center">
+                    {contact?.profilePic ? (
+                      <img 
+                        src={getMediaUrl(contact.profilePic)} 
+                        className="w-full h-full object-cover" 
+                        alt="" 
+                        onError={(e) => { e.target.src = `https://ui-avatars.com/api/?name=${contact.firstName}+${contact.lastName}&background=6366f1&color=fff&bold=true`; }}
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-slate-900 flex items-center justify-center text-4xl font-bold text-sky-500 uppercase italic transition-all">{contact?.firstName?.[0]}</div>
+                    )}
                  </div>
                  {/* Audio Pulse Visualizer */}
                  <div className="absolute -inset-8">

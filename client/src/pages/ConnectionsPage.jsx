@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { Users, UserPlus, Search, MapPin, Award, ArrowRight, UserMinus, PlusCircle, Compass, Zap, Terminal, Activity, ChevronLeft, X } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
+import { getMediaUrl } from '../utils/media';
 
 const ConnectionsPage = () => {
   const { user: currentUser } = useAuth();
@@ -100,7 +101,12 @@ const ConnectionsPage = () => {
                    <div className="flex items-center gap-3">
                       <div className="w-11 h-11 rounded-full overflow-hidden border border-slate-200 dark:border-white/10">
                          {c.profilePic ? (
-                           <img src={c.profilePic} className="w-full h-full object-cover" alt="" />
+                            <img 
+                              src={getMediaUrl(c.profilePic)} 
+                              className="w-full h-full object-cover" 
+                              alt="" 
+                              onError={(e) => { e.target.src = `https://ui-avatars.com/api/?name=${c.firstName}+${c.lastName}&background=6366f1&color=fff&bold=true`; }}
+                            />
                          ) : (
                            <div className="w-full h-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center font-bold text-sky-500 uppercase">{c.firstName?.[0]}</div>
                          )}

@@ -73,17 +73,18 @@ function AppRoutes() {
       />
       
       <div className="flex">
-        {user && <Sidebar />}
+        {/* SIDEBAR: Only show if user exists AND we are NOT on auth pages */}
+        {user && !['/login', '/register'].includes(window.location.pathname) && <Sidebar />}
         
         {/* Main Content Layout (Responsive Margin) */}
-        <div className={`flex-1 transition-all duration-300 ${user ? 'xl:ml-[280px] lg:ml-[85px]' : ''}`}>
-          {user && (
+        <div className={`flex-1 transition-all duration-300 ${user && !['/login', '/register'].includes(window.location.pathname) ? 'xl:ml-[280px] lg:ml-[85px]' : ''}`}>
+          {user && !['/login', '/register'].includes(window.location.pathname) && (
             <div className="lg:hidden sticky top-0 bg-white/80 dark:bg-black/80 backdrop-blur-md z-40">
               <Navbar />
             </div>
           )}
           
-          <main className="min-h-screen max-w-[1400px] mx-auto px-0 md:px-8 py-0 md:py-10 animate-fade-in pb-32">
+          <main className={`min-h-screen ${!['/login', '/register'].includes(window.location.pathname) ? 'max-w-[1400px] mx-auto px-0 md:px-8 py-0 md:py-10 pb-32' : ''} animate-fade-in`}>
              <Routes>
                <Route path="/login"    element={<LoginPage />} />
                <Route path="/register" element={<RegisterPage />} />
@@ -104,7 +105,7 @@ function AppRoutes() {
         </div>
       </div>
       
-      {user && (
+      {user && !['/login', '/register'].includes(window.location.pathname) && (
         <div className="lg:hidden">
            <BottomNav />
         </div>

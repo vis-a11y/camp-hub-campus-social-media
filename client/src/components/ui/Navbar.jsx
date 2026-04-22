@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import toast from 'react-hot-toast';
+import { getMediaUrl } from '../../utils/media';
 
 const Navbar = () => {
   const { user, logout } = useAuth();
@@ -133,8 +134,15 @@ const Navbar = () => {
                          searchResults.users.map(u => (
                            <button key={u._id} onClick={() => { navigate(`/profile/${u._id}`); setSearchResults(null); setSearchQuery(''); }}
                              className="flex items-center gap-4 w-full p-3 rounded-2xl hover:bg-slate-50 dark:hover:bg-white/5 text-left transition-all">
-                             <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-indigo-500 text-sm font-bold flex-shrink-0 border border-slate-200 dark:border-white/5">
-                               {u.profilePic ? <img src={u.profilePic} alt="" className="w-full h-full rounded-xl object-cover"/> : u.firstName?.[0] || 'U'}
+                             <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-indigo-500 text-sm font-bold flex-shrink-0 border border-slate-200 dark:border-white/5 overflow-hidden">
+                               {u.profilePic ? (
+                                 <img 
+                                   src={getMediaUrl(u.profilePic)} 
+                                   alt="" 
+                                   className="w-full h-full object-cover"
+                                   onError={(e) => { e.target.src = `https://ui-avatars.com/api/?name=${u.firstName}+${u.lastName}&background=6366f1&color=fff&bold=true`; }}
+                                 />
+                               ) : u.firstName?.[0] || 'U'}
                              </div>
                              <div>
                                <p className="text-sm font-bold text-slate-900 dark:text-white leading-none mb-1">{u.firstName} {u.lastName}</p>
@@ -182,11 +190,18 @@ const Navbar = () => {
                       </div>
                     ) : notifications.map(n => (
                       <div key={n._id} className={`flex gap-4 items-center px-6 py-4 hover:bg-slate-50 dark:hover:bg-white/5 transition-all cursor-pointer border-b border-slate-50 dark:border-white/5 ${!n.read ? 'bg-indigo-500/5' : ''}`}>
-                         <div className="w-10 h-10 rounded-xl bg-white dark:bg-slate-900 flex items-center justify-center flex-shrink-0 shadow-md border border-slate-100 dark:border-white/5 overflow-hidden">
-                           {n.sender?.profilePic
-                             ? <img src={n.sender.profilePic} alt="" className="w-full h-full object-cover" />
-                             : <span className="text-sm font-bold text-indigo-500 uppercase">{n.sender?.firstName?.[0]}</span>}
-                         </div>
+                          <div className="w-10 h-10 rounded-xl bg-white dark:bg-slate-900 flex items-center justify-center flex-shrink-0 shadow-md border border-slate-100 dark:border-white/5 overflow-hidden">
+                            {n.sender?.profilePic ? (
+                               <img 
+                                 src={getMediaUrl(n.sender.profilePic)} 
+                                 alt="" 
+                                 className="w-full h-full object-cover" 
+                                 onError={(e) => { e.target.src = `https://ui-avatars.com/api/?name=${n.sender.firstName}+${n.sender.lastName}&background=6366f1&color=fff&bold=true`; }}
+                               />
+                            ) : (
+                               <span className="text-sm font-bold text-indigo-500 uppercase">{n.sender?.firstName?.[0]}</span>
+                            )}
+                          </div>
                          <div className="flex-1 min-w-0">
                            <p className="text-xs text-slate-900 dark:text-slate-200 leading-snug">
                              <span className="font-bold text-slate-900 dark:text-white">{n.sender?.firstName} {n.sender?.lastName}</span>{' '}
@@ -210,9 +225,18 @@ const Navbar = () => {
               <MessageSquare size={20} />
             </button>
 
-            <button onClick={() => navigate('/profile')} className="ml-3 p-0.5 rounded-xl campus-story-ring group transition-transform active:scale-90 flex items-center justify-center">
+            <button onClick={() => navigate('/profile')} className="ml-3 p-0.5 rounded-xl campus-story-ring group transition-transform active:scale-90 flex items-center justify-center overflow-hidden">
               <div className="w-9 h-9 rounded-xl overflow-hidden border-2 border-white dark:border-slate-950 flex items-center justify-center bg-slate-100 dark:bg-slate-800 text-indigo-500 text-xs font-bold">
-                {user.profilePic ? <img src={user.profilePic} alt="" className="w-full h-full object-cover" /> : user.firstName?.[0] || 'U'}
+                {user?.profilePic ? (
+                  <img 
+                    src={getMediaUrl(user.profilePic)} 
+                    className="w-full h-full object-cover" 
+                    alt="" 
+                    onError={(e) => { e.target.src = `https://ui-avatars.com/api/?name=${user.firstName}+${user.lastName}&background=6366f1&color=fff&bold=true`; }}
+                  />
+                ) : (
+                   user?.firstName?.[0] || 'U'
+                )}
               </div>
             </button>
           </div>
