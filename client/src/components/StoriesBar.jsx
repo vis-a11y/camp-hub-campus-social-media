@@ -5,6 +5,7 @@ import { Plus, X, ChevronLeft, ChevronRight, Send, Camera, Image, Activity, User
 import { formatDistanceToNow } from 'date-fns';
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
+import { getMediaUrl } from '../utils/media';
 
 const StoriesBar = () => {
   const { user } = useAuth();
@@ -88,18 +89,6 @@ const StoriesBar = () => {
   const openViewer = (index) => {
     setActiveStoryIndex(index);
     setShowStoryViewer(true);
-  };
-
-  const getMediaUrl = (url) => {
-    if (!url) return '';
-    if (url.startsWith('http')) {
-      if (url.includes('localhost:')) {
-        const path = url.split('/uploads/')[1];
-        return `${axios.defaults.baseURL}/uploads/${path}`;
-      }
-      return url;
-    }
-    return `${axios.defaults.baseURL}${url.startsWith('/') ? '' : '/'}${url}`;
   };
 
   return (
@@ -272,7 +261,7 @@ const StoryViewer = ({ authorGroup, onClose, onNext, onPrev, viewedStories, setV
              <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-full border-2 border-white/50 overflow-hidden shadow-lg">
                    {authorGroup.author?.profilePic 
-                      ? <img src={authorGroup.author.profilePic} className="w-full h-full object-cover" />
+                      ? <img src={getMediaUrl(authorGroup.author.profilePic)} className="w-full h-full object-cover" />
                       : <div className="w-full h-full bg-indigo-600 flex items-center justify-center text-white font-bold text-sm uppercase">{authorGroup.author?.firstName?.[0]}</div>}
                 </div>
                 <div>
@@ -308,7 +297,7 @@ const StoryViewer = ({ authorGroup, onClose, onNext, onPrev, viewedStories, setV
                 </div>
              )}
              
-             {story?.imageUrl && <img src={story.imageUrl} className="w-full h-full object-contain" alt="" />}
+             {story?.imageUrl && <img src={getMediaUrl(story.imageUrl)} className="w-full h-full object-contain" alt="" />}
              
              {/* Interaction Areas */}
              <div className="absolute inset-y-0 left-0 w-1/3 z-20 cursor-pointer" onClick={(e) => { e.stopPropagation(); handlePrev(); }}></div>

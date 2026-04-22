@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { getMediaUrl } from '../utils/media';
 
 const Dashboard = () => {
   const { user, logout } = useAuth();
