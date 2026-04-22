@@ -5,6 +5,7 @@ import {
    Search, Plus, MapPin, Calendar, Clock, ArrowRight, X, Info, Camera, Trash2, ShieldCheck, Terminal, Upload, Sparkles, MoreHorizontal, MessageSquare, Heart, Bookmark, Smile, Minus, PlusSquare, Users, Activity
 } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { getMediaUrl } from '../utils/media';
 
 // Premium Experiences Hub for Campus Node Synchronization
 const EventsPage = () => {
@@ -171,7 +172,7 @@ const EventsPage = () => {
               >
                  {/* Event Image - Immersive */}
                  <div className="h-64 overflow-hidden relative">
-                    <img src={event.image || 'https://images.unsplash.com/photo-1540575861501-7cf05a4b125a?w=800'} alt="" className="w-full h-full object-cover transition-transform duration-1000 group-hover/card:scale-110" />
+                    <img src={getMediaUrl(event.image || 'https://images.unsplash.com/photo-1540575861501-7cf05a4b125a?w=800')} alt="" className="w-full h-full object-cover transition-transform duration-1000 group-hover/card:scale-110" />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-60 group-hover/card:opacity-40 transition-opacity"></div>
                     <div className="absolute bottom-6 left-6 right-6">
                        <span className="px-3 py-1 bg-white/10 backdrop-blur-md text-white text-[10px] font-bold uppercase tracking-widest rounded-full border border-white/20">
@@ -194,7 +195,7 @@ const EventsPage = () => {
                     <div className="flex items-center gap-3 mb-6">
                        <div className="w-10 h-10 rounded-xl campus-story-ring p-0.5">
                           <div className="w-full h-full rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center font-bold text-indigo-500 text-sm overflow-hidden border border-white dark:border-slate-900">
-                             {event.organizer?.profilePic ? <img src={event.organizer.profilePic} /> : event.organizer?.firstName?.[0] || 'A'}
+                             {event.organizer?.profilePic ? <img src={getMediaUrl(event.organizer.profilePic)} /> : event.organizer?.firstName?.[0] || 'A'}
                           </div>
                        </div>
                        <div>
@@ -397,7 +398,7 @@ const EventsPage = () => {
          <div className="modal-backdrop px-4 z-[200]">
             <div className="bg-white dark:bg-slate-900 w-full max-w-2xl rounded-[40px] shadow-3xl overflow-hidden border border-slate-200 dark:border-white/10 animate-fade-in flex flex-col max-h-[90vh]">
                <div className="h-[300px] sm:h-[400px] relative shrink-0 bg-slate-100 dark:bg-black">
-                  <img src={selectedEvent.image || 'https://images.unsplash.com/photo-1540575861501-7cf05a4b125a?w=800'} className="w-full h-full object-contain" />
+                  <img src={getMediaUrl(selectedEvent.image || 'https://images.unsplash.com/photo-1540575861501-7cf05a4b125a?w=800')} className="w-full h-full object-contain" />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent pointer-events-none"></div>
                   <button onClick={() => setSelectedEvent(null)} className="absolute top-6 right-6 w-12 h-12 bg-black/40 backdrop-blur-md rounded-2xl flex items-center justify-center text-white hover:bg-black/60 transition-all z-40 outline-none border border-white/10 shadow-2xl"><X size={24} /></button>
                   <div className="absolute bottom-8 left-10 right-10 z-30 pointer-events-none">
@@ -442,7 +443,7 @@ const EventsPage = () => {
                      <div className="flex items-center gap-4">
                         <div className="w-12 h-12 rounded-2xl campus-story-ring p-0.5">
                            <div className="w-full h-full rounded-2xl bg-white dark:bg-slate-800 flex items-center justify-center font-bold text-indigo-500 overflow-hidden">
-                              {selectedEvent.organizer?.profilePic ? <img src={selectedEvent.organizer.profilePic} /> : selectedEvent.organizer?.firstName?.[0]}
+                              {selectedEvent.organizer?.profilePic ? <img src={getMediaUrl(selectedEvent.organizer.profilePic)} /> : selectedEvent.organizer?.firstName?.[0]}
                            </div>
                         </div>
                         <div>

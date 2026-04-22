@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useLocation } from 'react-router-dom';
+import { getMediaUrl } from '../utils/media';
 
 const StudyGroups = () => {
   const { user } = useAuth();

@@ -324,6 +324,7 @@ const ProfilePage = () => {
         )}
         {activeTab === 'tagged' && <div className="py-40 text-center premium-card bg-slate-50/10 font-bold text-slate-400 uppercase tracking-widest">Not mentioned yet</div>}
       </div>
+      </div>
 
       {/* Redesigned Edit Profile Modal */}
       {showEditModal && (
@@ -422,7 +423,6 @@ const ProfilePage = () => {
             </div>
          </div>
       )}
-      </div>
     </>
   );
 };
