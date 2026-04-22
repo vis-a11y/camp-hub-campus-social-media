@@ -478,5 +478,7 @@ const EventsPage = () => {
          </div>
       )}
     </>
+  );
 };
+
 export default EventsPage;

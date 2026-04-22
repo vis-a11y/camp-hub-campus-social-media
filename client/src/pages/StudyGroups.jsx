@@ -187,7 +187,7 @@ const StudyGroups = () => {
 
                           {/* Club Image Area */}
                           <div className="h-64 sm:h-72 overflow-hidden relative group/img">
-                              <img src={club.image || 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=800'} alt={club.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000" />
+                              <img src={getMediaUrl(club.image || 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=800')} alt={club.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000" />
                               <div className="absolute top-4 left-4 bg-sky-500 text-white px-4 py-2 rounded-lg text-[11px] font-bold uppercase tracking-widest italic shadow-xl rotate-3 border border-white/20">
                                   ACTIVE HUB
                               </div>
@@ -270,7 +270,7 @@ const StudyGroups = () => {
               <div className="p-10 space-y-12 max-h-[85vh] overflow-y-auto no-scrollbar">
                  <div className="flex flex-col sm:flex-row gap-8 items-start border-b border-slate-100 dark:border-white/5 pb-8">
                      <div className="w-24 h-24 rounded-full overflow-hidden bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 shrink-0 flex items-center justify-center">
-                        {selectedCommittee.logo ? <img src={selectedCommittee.logo} className="w-full h-full object-cover" /> : <ShieldCheck size={40} className="text-sky-500 opacity-50" />}
+                        {selectedCommittee.logo ? <img src={getMediaUrl(selectedCommittee.logo)} className="w-full h-full object-cover" /> : <ShieldCheck size={40} className="text-sky-500 opacity-50" />}
                      </div>
                      <div className="flex-1 space-y-4">
                         <h4 className="text-[11px] font-bold text-slate-400 uppercase tracking-widest pl-2">Mission Objective</h4>
