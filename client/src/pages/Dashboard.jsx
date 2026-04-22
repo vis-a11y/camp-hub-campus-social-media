@@ -137,6 +137,7 @@ const Dashboard = () => {
   };
 
   return (
+    <>
     <div className="max-w-[1440px] mx-auto px-4 md:px-8 xl:px-12 py-10 animate-fade-in pb-32">
         <div className="feed-grid">
            {/* Left: Main Feed Content */}
@@ -303,115 +304,116 @@ const Dashboard = () => {
              <Plus size={32} strokeWidth={3} className="group-hover:rotate-90 transition-transform duration-300" />
           </button>
         )}
+     </div>
 
-        {/* Create Modal - Redesigned */}
-        {showCreateModal && (
-          <div className="modal-backdrop px-4">
-             <div className="bg-white dark:bg-slate-900 w-full max-w-[600px] rounded-3xl shadow-3xl overflow-hidden border border-slate-200 dark:border-white/10 flex flex-col h-[700px] animate-fade-in">
-                <div className="p-5 border-b border-slate-200 dark:border-white/10 flex justify-between items-center">
-                   <button onClick={() => setShowCreateModal(false)} className="w-10 h-10 flex items-center justify-center hover:bg-slate-100 dark:hover:bg-white/5 rounded-full transition-all"><X size={24} /></button>
-                   <h3 className="text-[18px] font-bold text-slate-900 dark:text-white">New Campus Publication</h3>
-                   <button 
-                     onClick={handleCreatePost}
-                     disabled={!postText.trim() && !imagePreview}
-                     className="premium-button text-[13px] uppercase tracking-widest py-2 px-6 disabled:opacity-30"
-                   >
-                     Publish
-                   </button>
-                </div>
-                
-                <div className="flex-1 flex flex-col overflow-y-auto no-scrollbar">
-                   {/* Media Upload Area - Premium */}
-                   <div className="w-full h-[400px] bg-slate-50 dark:bg-neutral-950 flex items-center justify-center relative border-b border-slate-200 dark:border-white/5">
-                      {!imagePreview ? (
-                         <label className="flex flex-col items-center gap-6 cursor-pointer hover:scale-105 transition-all p-10 text-center">
-                            <div className="w-20 h-20 bg-indigo-500/10 rounded-3xl flex items-center justify-center text-indigo-500 mb-2">
-                               <ImageIcon size={40} />
-                            </div>
-                            <div>
-                               <p className="text-xl font-bold text-slate-900 dark:text-white">Visual Content</p>
-                               <p className="text-sm text-slate-500 mt-1 max-w-[240px]">Drop high-quality images or student life videos here</p>
-                            </div>
-                            <input type="file" className="hidden" accept="image/*,video/*" onChange={handleImageChange} />
-                            <div className="mt-2 px-8 py-3 bg-indigo-500 hover:bg-indigo-600 text-white rounded-2xl text-sm font-bold shadow-xl shadow-indigo-500/20 transition-all uppercase tracking-widest">Browse Files</div>
-                         </label>
-                      ) : (
-                         <div className="w-full h-full relative">
-                            {selectedFile?.type?.startsWith('video/') ? (
-                               <video src={imagePreview} className="w-full h-full object-cover" controls autoPlay loop muted />
-                            ) : (
-                               <img src={imagePreview} className="w-full h-full object-cover" />
-                            )}
-                            <button onClick={() => {setImagePreview(null); setSelectedFile(null);}} className="absolute top-6 right-6 p-4 bg-black/60 text-white rounded-2xl hover:bg-black transition-all shadow-2xl backdrop-blur-md border border-white/10"><X size={24} /></button>
-                         </div>
-                      )}
-                   </div>
-
-                   {/* Post Details */}
-                   <div className="p-6 flex flex-col flex-1">
-                      <div className="flex items-center gap-3 mb-6">
-                         <div className="w-10 h-10 rounded-xl overflow-hidden shadow-md">
-                            {user?.profilePic ? <img src={user.profilePic} className="w-full h-full object-cover" /> : <div className="w-full h-full bg-indigo-500/10 flex items-center justify-center font-bold text-indigo-500 uppercase">{user?.firstName?.[0]}</div>}
+     {/* Create Modal - Redesigned & Isolate from transforms */}
+     {showCreateModal && (
+       <div className="modal-backdrop px-4">
+          <div className="bg-white dark:bg-slate-900 w-full max-w-[600px] rounded-3xl shadow-3xl overflow-hidden border border-slate-200 dark:border-white/10 flex flex-col h-[700px] animate-fade-in">
+             <div className="p-5 border-b border-slate-200 dark:border-white/10 flex justify-between items-center">
+                <button onClick={() => setShowCreateModal(false)} className="w-10 h-10 flex items-center justify-center hover:bg-slate-100 dark:hover:bg-white/5 rounded-full transition-all"><X size={24} /></button>
+                <h3 className="text-[18px] font-bold text-slate-900 dark:text-white">New Campus Publication</h3>
+                <button 
+                  onClick={handleCreatePost}
+                  disabled={!postText.trim() && !imagePreview}
+                  className="premium-button text-[13px] uppercase tracking-widest py-2 px-6 disabled:opacity-30"
+                >
+                  Publish
+                </button>
+             </div>
+             
+             <div className="flex-1 flex flex-col overflow-y-auto no-scrollbar">
+                {/* Media Upload Area - Premium */}
+                <div className="w-full h-[400px] bg-slate-50 dark:bg-neutral-950 flex items-center justify-center relative border-b border-slate-200 dark:border-white/5">
+                   {!imagePreview ? (
+                      <label className="flex flex-col items-center gap-6 cursor-pointer hover:scale-105 transition-all p-10 text-center">
+                         <div className="w-20 h-20 bg-indigo-500/10 rounded-3xl flex items-center justify-center text-indigo-500 mb-2">
+                            <ImageIcon size={40} />
                          </div>
                          <div>
-                            <p className="text-sm font-bold text-slate-900 dark:text-white">Posting as {user?.firstName}</p>
-                            <p className="text-xs text-slate-400 font-medium">{user?.role || 'Campus User'}</p>
+                            <p className="text-xl font-bold text-slate-900 dark:text-white">Visual Content</p>
+                            <p className="text-sm text-slate-500 mt-1 max-w-[240px]">Drop high-quality images or student life videos here</p>
                          </div>
+                         <input type="file" className="hidden" accept="image/*,video/*" onChange={handleImageChange} />
+                         <div className="mt-2 px-8 py-3 bg-indigo-500 hover:bg-indigo-600 text-white rounded-2xl text-sm font-bold shadow-xl shadow-indigo-500/20 transition-all uppercase tracking-widest">Browse Files</div>
+                      </label>
+                   ) : (
+                      <div className="w-full h-full relative">
+                         {selectedFile?.type?.startsWith('video/') ? (
+                            <video src={imagePreview} className="w-full h-full object-cover" controls autoPlay loop muted />
+                         ) : (
+                            <img src={imagePreview} className="w-full h-full object-cover" />
+                         )}
+                         <button onClick={() => {setImagePreview(null); setSelectedFile(null);}} className="absolute top-6 right-6 p-4 bg-black/60 text-white rounded-2xl hover:bg-black transition-all shadow-2xl backdrop-blur-md border border-white/10"><X size={24} /></button>
                       </div>
-                      
-                      <textarea 
-                        className="w-full flex-1 bg-transparent border-none text-[16px] outline-none text-slate-900 dark:text-white resize-none py-2 placeholder:text-slate-400 font-medium"
-                        placeholder="Share your thoughts, academic updates, or doubts with the community..." 
-                        value={postText}
-                        onChange={e => setPostText(e.target.value)}
-                      />
-
-                      {/* Category Chipset */}
-                      <div className="mt-8 flex flex-wrap gap-3 pt-6 border-t border-slate-200 dark:border-white/5">
-                          {['general', 'doubt'].map(type => (
-                             <button key={type} onClick={() => setPostType(type)} className={`px-6 py-2.5 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all ${postType === type ? 'accent-gradient-bg text-white shadow-lg shadow-indigo-500/20' : 'bg-slate-100 dark:bg-white/5 text-slate-500 hover:text-slate-900 dark:hover:text-white outline-1 outline-slate-200'}`}>{type}</button>
-                          ))}
-                          
-                          {/* Music Button */}
-                          <button 
-                            onClick={() => setShowMusicPicker(!showMusicPicker)}
-                            className={`px-6 py-2.5 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all ${selectedMusic ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/20' : 'bg-slate-100 dark:bg-white/5 text-slate-500 hover:text-slate-900 dark:hover:text-white outline-1 outline-slate-200'} flex items-center gap-2`}
-                          >
-                             <Activity size={14} /> {selectedMusic ? selectedMusic.title : 'Add Music'}
-                          </button>
-
-                          {(user?.role === 'faculty' || user?.role === 'admin') && ['announcement', 'notice'].map(type => (
-                             <button key={type} onClick={() => setPostType(type)} className={`px-6 py-2.5 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all ${postType === type ? 'bg-indigo-600 text-white shadow-lg' : 'bg-slate-100 dark:bg-white/5 text-slate-500 hover:text-slate-900 dark:hover:text-white outline-1 outline-slate-200'}`}>{type}</button>
-                          ))}
-                      </div>
-
-                      {/* Music Picker Dropdown */}
-                      {showMusicPicker && (
-                        <div className="mt-4 p-4 bg-slate-50 dark:bg-white/5 rounded-2xl border border-slate-200 dark:border-white/5 space-y-2 animate-scale-in">
-                           <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2 px-2">Select Track</p>
-                           {mockMusic.map(m => (
-                             <button 
-                               key={m.id} 
-                               onClick={() => { setSelectedMusic(m); setShowMusicPicker(false); }}
-                               className="w-full text-left p-3 hover:bg-white dark:hover:bg-white/5 rounded-xl flex items-center justify-between group transition-all"
-                             >
-                                <div>
-                                   <p className="text-sm font-bold text-slate-900 dark:text-white">{m.title}</p>
-                                   <p className="text-[11px] text-slate-500">{m.artist}</p>
-                                </div>
-                                <div className="p-2 bg-indigo-500/10 text-indigo-500 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity">
-                                   <Plus size={14} />
-                                </div>
-                             </button>
-                           ))}
-                        </div>
-                      )}
-                    </div>
+                   )}
                 </div>
+
+                {/* Post Details */}
+                <div className="p-6 flex flex-col flex-1">
+                   <div className="flex items-center gap-3 mb-6">
+                      <div className="w-10 h-10 rounded-xl overflow-hidden shadow-md">
+                         {user?.profilePic ? <img src={user.profilePic} className="w-full h-full object-cover" /> : <div className="w-full h-full bg-indigo-500/10 flex items-center justify-center font-bold text-indigo-500 uppercase">{user?.firstName?.[0]}</div>}
+                      </div>
+                      <div>
+                         <p className="text-sm font-bold text-slate-900 dark:text-white">Posting as {user?.firstName}</p>
+                         <p className="text-xs text-slate-400 font-medium">{user?.role || 'Campus User'}</p>
+                      </div>
+                   </div>
+                   
+                   <textarea 
+                     className="w-full flex-1 bg-transparent border-none text-[16px] outline-none text-slate-900 dark:text-white resize-none py-2 placeholder:text-slate-400 font-medium"
+                     placeholder="Share your thoughts, academic updates, or doubts with the community..." 
+                     value={postText}
+                     onChange={e => setPostText(e.target.value)}
+                   />
+
+                   {/* Category Chipset */}
+                   <div className="mt-8 flex flex-wrap gap-3 pt-6 border-t border-slate-200 dark:border-white/5">
+                       {['general', 'doubt'].map(type => (
+                          <button key={type} onClick={() => setPostType(type)} className={`px-6 py-2.5 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all ${postType === type ? 'accent-gradient-bg text-white shadow-lg shadow-indigo-500/20' : 'bg-slate-100 dark:bg-white/5 text-slate-500 hover:text-slate-900 dark:hover:text-white outline-1 outline-slate-200'}`}>{type}</button>
+                       ))}
+                       
+                       {/* Music Button */}
+                       <button 
+                         onClick={() => setShowMusicPicker(!showMusicPicker)}
+                         className={`px-6 py-2.5 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all ${selectedMusic ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/20' : 'bg-slate-100 dark:bg-white/5 text-slate-500 hover:text-slate-900 dark:hover:text-white outline-1 outline-slate-200'} flex items-center gap-2`}
+                       >
+                          <Activity size={14} /> {selectedMusic ? selectedMusic.title : 'Add Music'}
+                       </button>
+
+                       {(user?.role === 'faculty' || user?.role === 'admin') && ['announcement', 'notice'].map(type => (
+                          <button key={type} onClick={() => setPostType(type)} className={`px-6 py-2.5 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all ${postType === type ? 'bg-indigo-600 text-white shadow-lg' : 'bg-slate-100 dark:bg-white/5 text-slate-500 hover:text-slate-900 dark:hover:text-white outline-1 outline-slate-200'}`}>{type}</button>
+                       ))}
+                   </div>
+
+                   {/* Music Picker Dropdown */}
+                   {showMusicPicker && (
+                     <div className="mt-4 p-4 bg-slate-50 dark:bg-white/5 rounded-2xl border border-slate-200 dark:border-white/5 space-y-2 animate-scale-in">
+                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2 px-2">Select Track</p>
+                        {mockMusic.map(m => (
+                          <button 
+                            key={m.id} 
+                            onClick={() => { setSelectedMusic(m); setShowMusicPicker(false); }}
+                            className="w-full text-left p-3 hover:bg-white dark:hover:bg-white/5 rounded-xl flex items-center justify-between group transition-all"
+                          >
+                             <div>
+                                <p className="text-sm font-bold text-slate-900 dark:text-white">{m.title}</p>
+                                <p className="text-[11px] text-slate-500">{m.artist}</p>
+                             </div>
+                             <div className="p-2 bg-indigo-500/10 text-indigo-500 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity">
+                                <Plus size={14} />
+                             </div>
+                          </button>
+                        ))}
+                     </div>
+                   )}
+                 </div>
              </div>
           </div>
-        )}
-    </div>
+       </div>
+     )}
+    </>
   );
 };
 
