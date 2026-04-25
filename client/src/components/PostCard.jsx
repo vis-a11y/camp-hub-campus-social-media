@@ -7,6 +7,7 @@ import {
 import { formatDistanceToNow } from 'date-fns';
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
+import { getMediaUrl } from '../utils/media';
 
 const PostCard = ({ post, onDelete }) => {
   const { user } = useAuth();
