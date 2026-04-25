@@ -16,12 +16,13 @@ import ProjectsPage from './pages/ProjectsPage';
 import Navbar from './components/ui/Navbar';
 import Sidebar from './components/Sidebar';
 import BottomNav from './components/BottomNav';
-import { Toaster } from 'react-hot-toast';
+import toast, { Toaster } from 'react-hot-toast';
 import axios from 'axios';
 
 // POINTED TO REAL-TIME BACKEND
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://campchat-campus-hub-2.onrender.com';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || (import.meta.env.DEV ? 'http://localhost:5001' : 'https://campchat-campus-hub-2.onrender.com');
 axios.defaults.baseURL = API_BASE_URL;
+axios.defaults.withCredentials = true; // Crucial for session cookies
 
 // Global Response Interceptor
 axios.interceptors.response.use(
@@ -29,7 +30,6 @@ axios.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401) {
       console.warn('Session expired or unauthorized');
-      // We don't force logout/redirect here because of Guest Mode
     }
     if (!error.response) {
       toast.error('Network Error: Connectivity with Hub lost', { id: 'network-err' });
