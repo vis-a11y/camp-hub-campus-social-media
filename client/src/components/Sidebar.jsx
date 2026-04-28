@@ -55,13 +55,17 @@ const Sidebar = () => {
                 : 'text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-white/5'}
             `}
           >
-            <item.icon size={24} strokeWidth={isActive ? 2.5 : 2} />
-            <span className={`text-[15px] font-bold uppercase tracking-widest hidden xl:block ${isHovered === item.label ? 'translate-x-1' : ''} transition-transform`}>
-              {item.label}
-            </span>
-            
-            {/* Active Indicator */}
-            <div className={`absolute left-0 w-1 h-8 bg-indigo-500 rounded-r-full transition-all duration-300 ${location.pathname === item.path ? 'opacity-100 scale-100' : 'opacity-0 scale-0'}`} />
+            {({ isActive }) => (
+              <>
+                <item.icon size={24} strokeWidth={isActive ? 2.5 : 2} />
+                <span className={`text-[15px] font-bold uppercase tracking-widest hidden xl:block ${isHovered === item.label ? 'translate-x-1' : ''} transition-transform`}>
+                  {item.label}
+                </span>
+                
+                {/* Active Indicator */}
+                <div className={`absolute left-0 w-1 h-8 bg-indigo-500 rounded-r-full transition-all duration-300 ${isActive ? 'opacity-100 scale-100' : 'opacity-0 scale-0'}`} />
+              </>
+            )}
           </NavLink>
         ))}
       </nav>

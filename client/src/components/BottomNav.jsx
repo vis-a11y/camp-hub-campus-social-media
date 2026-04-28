@@ -24,7 +24,9 @@ const BottomNav = () => {
               : 'text-slate-400 hover:text-slate-900 dark:hover:text-white'}
           `}
         >
-          <link.icon size={26} strokeWidth={isActive ? 3 : 2} />
+          {({ isActive }) => (
+            <link.icon size={26} strokeWidth={isActive ? 3 : 2} />
+          )}
         </NavLink>
       ))}
     </nav>
