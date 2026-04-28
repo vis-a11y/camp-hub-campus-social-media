@@ -60,6 +60,30 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
+// CLOUDINARY CONFIGURATION (For Persistent Storage)
+let cloudUpload = null;
+if (process.env.CLOUDINARY_CLOUD_NAME) {
+  const cloudinary = require('cloudinary').v2;
+  const { CloudinaryStorage } = require('multer-storage-cloudinary');
+
+  cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET
+  });
+
+  const cloudStorage = new CloudinaryStorage({
+    cloudinary: cloudinary,
+    params: {
+      folder: 'campus-hub-media',
+      allowed_formats: ['jpg', 'png', 'jpeg', 'gif', 'mp4', 'webp'],
+      resource_type: 'auto'
+    }
+  });
+  cloudUpload = multer({ storage: cloudStorage });
+  console.log('☁️  Cloudinary storage initialized for persistent media.');
+}
+
 // Middleware
 app.use(helmet({
   crossOriginResourcePolicy: { policy: "cross-origin" },
@@ -105,13 +129,25 @@ app.use(morgan(process.env.NODE_ENV === 'production' ? 'combined' : 'dev'));
 
 app.use('/uploads', express.static(uploadsDir));
 
-app.post('/api/upload', upload.single('file'), (req, res) => {
-  if (!req.file) return res.status(400).json({ message: 'No file uploaded' });
+app.post('/api/upload', (req, res, next) => {
+  // Use Cloudinary if configured, otherwise local disk
+  const uploader = cloudUpload ? cloudUpload.single('file') : upload.single('file');
   
-  // Use a relative path or a full URL based on the environment
-  const protocol = req.headers['x-forwarded-proto'] || req.protocol;
-  const url = `${protocol}://${req.get('host')}/uploads/${req.file.filename}`;
-  res.json({ url, filename: req.file.filename });
+  uploader(req, res, (err) => {
+    if (err) {
+      console.error('Upload Error:', err);
+      return res.status(400).json({ message: 'File upload failed', error: err.message });
+    }
+    if (!req.file) return res.status(400).json({ message: 'No file received' });
+    
+    // Cloudinary returns the full URL in 'path', Multer-disk returns 'filename'
+    const url = req.file.path || `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`;
+    res.json({ 
+      url, 
+      filename: req.file.filename || req.file.public_id,
+      storage: cloudUpload ? 'cloudinary' : 'local'
+    });
+  });
 });
 
 const mongoURI = process.env.MONGODB_URI;

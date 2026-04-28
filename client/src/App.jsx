@@ -54,75 +54,68 @@ const ProtectedRoute = ({ children }) => {
   return children; 
 };
 
+/**
+ * MainLayout: Only rendered for protected application routes.
+ * This is the ultimate guard against sidebar overlap on login pages.
+ */
+const MainLayout = ({ user }) => {
+  return (
+    <div className="flex relative min-h-screen">
+      {/* SIDEBAR: Only exists in this layout */}
+      <Sidebar />
+      
+      {/* Main Content Layout */}
+      <div className="flex-1 flex flex-col transition-all duration-300 xl:ml-[280px] lg:ml-[85px] ml-0">
+        {/* Mobile Top Navbar */}
+        <div className="lg:hidden sticky top-0 bg-white/80 dark:bg-black/80 backdrop-blur-md z-40 border-b border-slate-100 dark:border-white/5">
+          <Navbar />
+        </div>
+        
+        <main className="flex-1 max-w-[1440px] mx-auto w-full px-0 md:px-8 py-0 md:py-10 pb-32">
+          <Outlet />
+        </main>
+        
+        {/* Mobile Bottom Navigation */}
+        <div className="lg:hidden">
+           <BottomNav />
+        </div>
+      </div>
+    </div>
+  );
+};
+
 function AppRoutes() {
   const { user, loading } = useAuth();
-  const location = useLocation();
   
-  // Use location.pathname as primary, window.location.pathname as secondary fallback
-  const currentPath = (location.pathname || window.location.pathname || '').toLowerCase();
-  
-  // 2. Extremely broad Auth Page check - hide on login, register, or the root landing
-  const isAuthPage = currentPath.includes('login') || 
-                     currentPath.includes('register') || 
-                     currentPath === '/' || 
-                     currentPath === '';
-
   if (loading) return null;
-
-  // Final confirmation: show navigation ONLY if we have a user AND we are NOT on an auth/root page
-  const showNavigation = !!user && !isAuthPage;
 
   return (
     <div className="min-h-screen bg-white dark:bg-slate-950 font-sans selection:bg-indigo-500/10 overflow-x-hidden">
       <Toaster position="bottom-left" />
       
-      <div className="flex relative min-h-screen">
-        {/* SIDEBAR: Absolute guard against showing on login/register */}
-        {showNavigation && <Sidebar />}
+      <Routes>
+        {/* 1. AUTH WORLD: Pure pages with zero navigation overhead */}
+        <Route path="/login"    element={user ? <Navigate to="/dashboard" replace /> : <LoginPage />} />
+        <Route path="/register" element={user ? <Navigate to="/dashboard" replace /> : <RegisterPage />} />
         
-        {/* Main Content Layout */}
-        <div className={`flex-1 flex flex-col transition-all duration-300 ${showNavigation ? 'xl:ml-[280px] lg:ml-[85px]' : 'ml-0'}`}>
-          {/* Mobile Top Navbar: Same absolute guard */}
-          {showNavigation && (
-            <div className="lg:hidden sticky top-0 bg-white/80 dark:bg-black/80 backdrop-blur-md z-40 border-b border-slate-100 dark:border-white/5">
-              <Navbar />
-            </div>
-          )}
-          
-          <main className={`flex-1 ${!isAuthPage ? 'max-w-[1440px] mx-auto w-full px-0 md:px-8 py-0 md:py-10 pb-32' : 'w-full flex items-center justify-center'}`}>
-             <Routes>
-               {/* Authentication Routes: Force redirect if already logged in */}
-               <Route path="/login"    element={user ? <Navigate to="/dashboard" replace /> : <LoginPage />} />
-               <Route path="/register" element={user ? <Navigate to="/dashboard" replace /> : <RegisterPage />} />
-               
-               {/* Root Redirect: Directs to login if guest, dashboard if member */}
-               <Route path="/" element={<Navigate to={user ? "/dashboard" : "/login"} replace />} />
+        {/* 2. APP WORLD: Wrapped in MainLayout for all internal features */}
+        <Route element={user ? <MainLayout user={user} /> : <Navigate to="/login" replace />}>
+          <Route path="/dashboard"     element={<Dashboard />} />
+          <Route path="/profile"       element={<ProfilePage />} />
+          <Route path="/profile/:id"   element={<ProfilePage />} />
+          <Route path="/study-groups"  element={<StudyGroups />} />
+          <Route path="/chats"         element={<ChatSystem />} />
+          <Route path="/explore"       element={<ExplorePage />} />
+          <Route path="/notifications" element={<NotificationsPage />} />
+          <Route path="/connections"   element={<ConnectionsPage />} />
+          <Route path="/events"        element={<EventsPage />} />
+          <Route path="/projects"      element={<ProjectsPage />} />
+        </Route>
 
-               {/* Protected Application Routes */}
-               <Route path="/dashboard"     element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-               <Route path="/profile"       element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
-               <Route path="/profile/:id"   element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
-               <Route path="/study-groups"  element={<ProtectedRoute><StudyGroups /></ProtectedRoute>} />
-               <Route path="/chats"         element={<ProtectedRoute><ChatSystem /></ProtectedRoute>} />
-               <Route path="/explore"       element={<ProtectedRoute><ExplorePage /></ProtectedRoute>} />
-               <Route path="/notifications" element={<ProtectedRoute><NotificationsPage /></ProtectedRoute>} />
-               <Route path="/connections"   element={<ProtectedRoute><ConnectionsPage /></ProtectedRoute>} />
-               <Route path="/events"        element={<ProtectedRoute><EventsPage /></ProtectedRoute>} />
-               <Route path="/projects"      element={<ProtectedRoute><ProjectsPage /></ProtectedRoute>} />
-               
-               {/* Fallback to Root */}
-               <Route path="*" element={<Navigate to="/" replace />} />
-             </Routes>
-          </main>
-          
-          {/* Mobile Bottom Navigation */}
-          {showNavigation && (
-            <div className="lg:hidden">
-               <BottomNav />
-            </div>
-          )}
-        </div>
-      </div>
+        {/* 3. GLOBAL REDIRECTS */}
+        <Route path="/" element={<Navigate to={user ? "/dashboard" : "/login"} replace />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
     </div>
   );
 }

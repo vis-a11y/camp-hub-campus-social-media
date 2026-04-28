@@ -16,12 +16,17 @@ export const getMediaUrl = (url, name = 'User') => {
   const apiBase = import.meta.env.VITE_API_BASE_URL || axios.defaults.baseURL || 'https://campchat-campus-hub-2.onrender.com';
   const baseUrl = apiBase.replace(/\/$/, ''); 
 
-  // If it's already an absolute URL
+  // If it's already an absolute URL (Cloudinary or others)
   if (url.startsWith('http')) {
     // 1. Force HTTPS on production URLs to avoid mixed content errors
     let secureUrl = url.replace(/^http:/, 'https:');
     
-    // 2. Map legacy localhost to the current API base
+    // 2. If it's already a Cloudinary or external URL, return it as is
+    if (secureUrl.includes('cloudinary.com') || !secureUrl.includes('localhost')) {
+      return secureUrl;
+    }
+
+    // 3. Map legacy localhost to the current API base
     if (secureUrl.includes('localhost:')) {
       const parts = secureUrl.split('/uploads/');
       if (parts.length > 1) return `${baseUrl}/uploads/${parts[1]}`;
@@ -29,7 +34,7 @@ export const getMediaUrl = (url, name = 'User') => {
     return secureUrl;
   }
   
-  // 3. Handle relative paths
+  // 3. Handle relative paths (for local uploads)
   const cleanUrl = url.startsWith('/') ? url : `/${url}`;
   return `${baseUrl}${cleanUrl}`;
 };
