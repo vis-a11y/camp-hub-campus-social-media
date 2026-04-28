@@ -57,15 +57,18 @@ const ProtectedRoute = ({ children }) => {
 function AppRoutes() {
   const { user, loading } = useAuth();
   const location = useLocation();
-  const pathname = location.pathname;
+  
+  // Normalize pathname to handle trailing slashes
+  const pathname = location.pathname.replace(/\/$/, '') || '/';
 
-  if (loading) return null; // Or a splash screen
+  if (loading) return null;
 
   const isAuthPage = ['/login', '/register'].includes(pathname);
-  const showNav = user && !isAuthPage;
+  // Navigation should ONLY show if the user is authenticated AND NOT on an auth page
+  const showNav = !!user && !isAuthPage;
 
   return (
-    <div className={`min-h-screen bg-white dark:bg-black font-sans selection:bg-sky-100 dark:selection:bg-sky-900/40`}>
+    <div className={`min-h-screen bg-white dark:bg-black font-sans selection:bg-sky-100 dark:selection:bg-sky-900/40 overflow-x-hidden`}>
       <Toaster
         position="bottom-left"
         toastOptions={{
@@ -78,31 +81,33 @@ function AppRoutes() {
             fontWeight: '500',
             padding: '12px 20px',
             boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
-          },
-          success: {
-            iconTheme: { primary: '#0095f6', secondary: '#fff' }
           }
         }}
       />
       
-      <div className="flex">
-        {/* SIDEBAR: Only show if user exists AND we are NOT on auth pages */}
+      <div className="flex relative">
+        {/* SIDEBAR: Hidden on Auth pages and for Guests */}
         {showNav && <Sidebar />}
         
-        {/* Main Content Layout (Responsive Margin) */}
+        {/* Main Content Layout */}
         <div className={`flex-1 transition-all duration-300 ${showNav ? 'xl:ml-[280px] lg:ml-[85px]' : ''}`}>
+          {/* Mobile Top Navbar */}
           {showNav && (
-            <div className="lg:hidden sticky top-0 bg-white/80 dark:bg-black/80 backdrop-blur-md z-40">
+            <div className="lg:hidden sticky top-0 bg-white/80 dark:bg-black/80 backdrop-blur-md z-40 border-b border-slate-100 dark:border-white/5">
               <Navbar />
             </div>
           )}
           
-          <main className={`min-h-screen ${!isAuthPage ? 'max-w-[1400px] mx-auto px-0 md:px-8 py-0 md:py-10 pb-32' : ''} animate-fade-in`}>
+          <main className={`min-h-screen ${!isAuthPage ? 'max-w-[1400px] mx-auto px-0 md:px-8 py-0 md:py-10 pb-32' : 'flex items-center justify-center'}`}>
              <Routes>
-               <Route path="/login"    element={user ? <Navigate to="/dashboard" /> : <LoginPage />} />
-               <Route path="/register" element={user ? <Navigate to="/dashboard" /> : <RegisterPage />} />
-               <Route path="/"         element={<Navigate to={user ? "/dashboard" : "/login"} />} />
+               {/* Authentication Routes */}
+               <Route path="/login"    element={user ? <Navigate to="/dashboard" replace /> : <LoginPage />} />
+               <Route path="/register" element={user ? <Navigate to="/dashboard" replace /> : <RegisterPage />} />
+               
+               {/* Root Redirect */}
+               <Route path="/" element={<Navigate to={user ? "/dashboard" : "/login"} replace />} />
 
+               {/* Protected Application Routes */}
                <Route path="/dashboard"     element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
                <Route path="/profile"       element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
                <Route path="/profile/:id"   element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
@@ -113,11 +118,15 @@ function AppRoutes() {
                <Route path="/connections"   element={<ProtectedRoute><ConnectionsPage /></ProtectedRoute>} />
                <Route path="/events"        element={<ProtectedRoute><EventsPage /></ProtectedRoute>} />
                <Route path="/projects"      element={<ProtectedRoute><ProjectsPage /></ProtectedRoute>} />
+               
+               {/* Fallback */}
+               <Route path="*" element={<Navigate to="/" replace />} />
              </Routes>
           </main>
         </div>
       </div>
       
+      {/* Mobile Bottom Navigation */}
       {showNav && (
         <div className="lg:hidden">
            <BottomNav />
