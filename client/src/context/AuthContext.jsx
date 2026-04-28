@@ -4,8 +4,12 @@ import { useNavigate } from 'react-router-dom';
 
 const AuthContext = createContext();
 
-// Configure API base URL for production support
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
+// SYNCED API BASE: Match App.jsx logic for production stability
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 
+  (import.meta.env.DEV ? 'http://localhost:5001' : 'https://campchat-campus-hub-2.onrender.com');
+
+// Ensure axios uses this as default for all calls
+axios.defaults.baseURL = API_BASE_URL;
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
