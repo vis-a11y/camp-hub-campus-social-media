@@ -94,11 +94,11 @@ function AppRoutes() {
       <Toaster position="bottom-left" />
       
       <Routes>
-        {/* 1. AUTH WORLD: Pure pages with zero navigation overhead */}
-        <Route path="/login"    element={user ? <Navigate to="/dashboard" replace /> : <LoginPage />} />
-        <Route path="/register" element={user ? <Navigate to="/dashboard" replace /> : <RegisterPage />} />
+        {/* 1. AUTH BRANCH: Completely isolated from Sidebar/Navbar */}
+        <Route path="/login"    element={user ? <Navigate to="/dashboard" replace /> : <div className="auth-wrapper"><LoginPage /></div>} />
+        <Route path="/register" element={user ? <Navigate to="/dashboard" replace /> : <div className="auth-wrapper"><RegisterPage /></div>} />
         
-        {/* 2. APP WORLD: Wrapped in MainLayout for all internal features */}
+        {/* 2. APP BRANCH: Only renders if user is authenticated */}
         <Route element={user ? <MainLayout user={user} /> : <Navigate to="/login" replace />}>
           <Route path="/dashboard"     element={<Dashboard />} />
           <Route path="/profile"       element={<ProfilePage />} />
@@ -112,7 +112,7 @@ function AppRoutes() {
           <Route path="/projects"      element={<ProjectsPage />} />
         </Route>
 
-        {/* 3. GLOBAL REDIRECTS */}
+        {/* 3. FALLBACKS */}
         <Route path="/" element={<Navigate to={user ? "/dashboard" : "/login"} replace />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
