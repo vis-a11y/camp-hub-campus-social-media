@@ -43,13 +43,26 @@ if (import.meta.env.DEV) {
 }
 
 const ProtectedRoute = ({ children }) => {
-  // RESTRICTIONS REMOVED: All routes are now public.
-  // We still provide the user context if available, otherwise features work in guest mode.
+  const { user, loading } = useAuth();
+  
+  if (loading) return null;
+  
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
+
   return children; 
 };
 
 function AppRoutes() {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
+  const location = useLocation();
+  const pathname = location.pathname;
+
+  if (loading) return null; // Or a splash screen
+
+  const isAuthPage = ['/login', '/register'].includes(pathname);
+  const showNav = user && !isAuthPage;
 
   return (
     <div className={`min-h-screen bg-white dark:bg-black font-sans selection:bg-sky-100 dark:selection:bg-sky-900/40`}>
@@ -74,21 +87,21 @@ function AppRoutes() {
       
       <div className="flex">
         {/* SIDEBAR: Only show if user exists AND we are NOT on auth pages */}
-        {user && !['/login', '/register'].includes(window.location.pathname) && <Sidebar />}
+        {showNav && <Sidebar />}
         
         {/* Main Content Layout (Responsive Margin) */}
-        <div className={`flex-1 transition-all duration-300 ${user && !['/login', '/register'].includes(window.location.pathname) ? 'xl:ml-[280px] lg:ml-[85px]' : ''}`}>
-          {user && !['/login', '/register'].includes(window.location.pathname) && (
+        <div className={`flex-1 transition-all duration-300 ${showNav ? 'xl:ml-[280px] lg:ml-[85px]' : ''}`}>
+          {showNav && (
             <div className="lg:hidden sticky top-0 bg-white/80 dark:bg-black/80 backdrop-blur-md z-40">
               <Navbar />
             </div>
           )}
           
-          <main className={`min-h-screen ${!['/login', '/register'].includes(window.location.pathname) ? 'max-w-[1400px] mx-auto px-0 md:px-8 py-0 md:py-10 pb-32' : ''} animate-fade-in`}>
+          <main className={`min-h-screen ${!isAuthPage ? 'max-w-[1400px] mx-auto px-0 md:px-8 py-0 md:py-10 pb-32' : ''} animate-fade-in`}>
              <Routes>
-               <Route path="/login"    element={<LoginPage />} />
-               <Route path="/register" element={<RegisterPage />} />
-               <Route path="/"         element={<Navigate to="/dashboard" />} />
+               <Route path="/login"    element={user ? <Navigate to="/dashboard" /> : <LoginPage />} />
+               <Route path="/register" element={user ? <Navigate to="/dashboard" /> : <RegisterPage />} />
+               <Route path="/"         element={<Navigate to={user ? "/dashboard" : "/login"} />} />
 
                <Route path="/dashboard"     element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
                <Route path="/profile"       element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
@@ -105,7 +118,7 @@ function AppRoutes() {
         </div>
       </div>
       
-      {user && !['/login', '/register'].includes(window.location.pathname) && (
+      {showNav && (
         <div className="lg:hidden">
            <BottomNav />
         </div>
