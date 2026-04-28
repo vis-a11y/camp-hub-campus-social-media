@@ -6,26 +6,16 @@
 
 :root {
   --accent: #6366f1;
-  --accent-glow: rgba(99, 102, 241, 0.5);
   --bg-dark: #020617;
-  --card-dark: rgba(15, 23, 42, 0.7);
-  --border-dark: rgba(255, 255, 255, 0.08);
-  --text-main: #f8fafc;
-  --text-dim: #94a3b8;
 }
 
 @layer base {
   body {
     @apply bg-white dark:bg-[#020617] text-slate-900 dark:text-slate-100 font-['Outfit'] antialiased selection:bg-indigo-500/20 selection:text-indigo-500;
   }
-  
-  * {
-    @apply transition-colors duration-200;
-  }
 }
 
 @layer components {
-  /* THE VAULT DESIGN SYSTEM */
   .premium-card {
     @apply bg-white/80 dark:bg-[#0f172a]/60 backdrop-blur-3xl border border-slate-200 dark:border-white/5 shadow-2xl shadow-black/5 rounded-[2.5rem];
   }
@@ -43,37 +33,16 @@
   }
 
   .premium-button {
-    @apply accent-gradient-bg text-white font-black rounded-2xl px-8 py-4 transition-all hover:scale-[1.02] active:scale-95 disabled:opacity-50 disabled:pointer-events-none shadow-xl shadow-indigo-500/20;
+    @apply accent-gradient-bg text-white font-black rounded-2xl px-8 py-4 transition-all hover:scale-[1.02] active:scale-95 disabled:opacity-50 shadow-xl shadow-indigo-500/20;
   }
-
-  /* UTILITIES */
-  .no-scrollbar::-webkit-scrollbar { display: none; }
-  .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
   .campus-story-ring {
     @apply p-[2px] bg-gradient-to-tr from-amber-400 via-rose-500 to-indigo-600 rounded-full;
   }
 }
 
-/* ANIMATIONS */
 @keyframes fade-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 .animate-fade-in { animation: fade-in 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
 
 @keyframes scale-in { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
 .animate-scale-in { animation: scale-in 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-
-@keyframes pulse-glow { 
-  0% { opacity: 0.1; transform: scale(1); } 
-  50% { opacity: 0.2; transform: scale(1.1); } 
-  100% { opacity: 0.1; transform: scale(1); } 
-}
-.animate-pulse-glow { animation: pulse-glow 8s infinite ease-in-out; }
-
-/* LAYOUT STRUCTURE */
-.app-galaxy {
-  @apply min-h-screen flex relative;
-}
-
-.auth-galaxy {
-  @apply min-h-screen flex items-center justify-center bg-[#020617];
-}
