@@ -12,6 +12,12 @@ const Sidebar = () => {
   const navigate = useNavigate();
   const [isHovered, setIsHovered] = useState(null);
 
+  // EXTRA SAFETY GUARD: Prevent rendering on auth pages even if layout fails
+  const currentPath = (location.pathname || window.location.pathname || '').toLowerCase();
+  const isAuthPage = currentPath.includes('login') || currentPath.includes('register') || currentPath === '/';
+  
+  if (isAuthPage || !user) return null;
+
   const menuItems = [
     { icon: Home,          label: 'Feed',          path: '/dashboard' },
     { icon: Compass,       label: 'Discovery',     path: '/explore' },
