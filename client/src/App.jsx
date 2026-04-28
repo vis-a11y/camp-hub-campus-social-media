@@ -1,5 +1,5 @@
 import React from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { ThemeProvider } from './context/ThemeContext';
 import LoginPage from './pages/LoginPage';
@@ -59,37 +59,39 @@ function AppRoutes() {
   const location = useLocation();
   
   // 1. Normalize pathname to handle trailing slashes and casing
-  const pathname = location.pathname.toLowerCase().replace(/\/$/, '') || '/';
+  const pathname = location.pathname.toLowerCase();
+  
+  // 2. Extremely defensive Auth Page check
+  // Check for exact matches or paths starting with /login or /register
+  const isAuthPage = pathname === '/login' || 
+                     pathname === '/login/' || 
+                     pathname === '/register' || 
+                     pathname === '/register/' ||
+                     pathname.startsWith('/login?') ||
+                     pathname.startsWith('/register?');
 
   if (loading) return null;
 
-  // 2. Extremely defensive Auth Page check
-  const isAuthPage = pathname.includes('login') || pathname.includes('register');
-  
-  // 3. Iron-clad Sidebar/Navbar visibility: 
-  // - MUST have a user
-  // - MUST NOT be an auth page
-  // - MUST NOT be the root if it's about to redirect to login
-  const showNav = !!user && !isAuthPage && pathname !== '/';
+  const showNavigation = !!user && !isAuthPage;
 
   return (
-    <div className={`min-h-screen bg-white dark:bg-black font-sans selection:bg-sky-100 dark:selection:bg-sky-900/40 overflow-x-hidden`}>
+    <div className="min-h-screen bg-white dark:bg-slate-950 font-sans selection:bg-indigo-500/10 overflow-x-hidden">
       <Toaster position="bottom-left" />
       
       <div className="flex relative min-h-screen">
         {/* SIDEBAR: Absolute guard against showing on login/register */}
-        {!isAuthPage && !!user && <Sidebar />}
+        {showNavigation && <Sidebar />}
         
         {/* Main Content Layout */}
-        <div className={`flex-1 flex flex-col transition-all duration-300 ${(!isAuthPage && !!user) ? 'xl:ml-[280px] lg:ml-[85px]' : ''}`}>
+        <div className={`flex-1 flex flex-col transition-all duration-300 ${showNavigation ? 'xl:ml-[280px] lg:ml-[85px]' : 'ml-0'}`}>
           {/* Mobile Top Navbar: Same absolute guard */}
-          {!isAuthPage && !!user && (
+          {showNavigation && (
             <div className="lg:hidden sticky top-0 bg-white/80 dark:bg-black/80 backdrop-blur-md z-40 border-b border-slate-100 dark:border-white/5">
               <Navbar />
             </div>
           )}
           
-          <main className={`flex-1 ${!isAuthPage ? 'max-w-[1400px] mx-auto px-0 md:px-8 py-0 md:py-10 pb-32' : 'w-full flex items-center justify-center'}`}>
+          <main className={`flex-1 ${!isAuthPage ? 'max-w-[1440px] mx-auto w-full px-0 md:px-8 py-0 md:py-10 pb-32' : 'w-full flex items-center justify-center'}`}>
              <Routes>
                {/* Authentication Routes: Force redirect if already logged in */}
                <Route path="/login"    element={user ? <Navigate to="/dashboard" replace /> : <LoginPage />} />
@@ -116,7 +118,7 @@ function AppRoutes() {
           </main>
           
           {/* Mobile Bottom Navigation */}
-          {!isAuthPage && !!user && (
+          {showNavigation && (
             <div className="lg:hidden">
                <BottomNav />
             </div>
