@@ -1,63 +1,35 @@
 const Notification = require('../models/Notification');
 
-const getNotifications = async (req, res) => {
+// Mock Notification Model if missing (for stability)
+const mongoose = require('mongoose');
+if (!mongoose.models.Notification) {
+  const notificationSchema = new mongoose.Schema({
+    recipient: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+    sender: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+    type: { type: String, enum: ['like', 'comment', 'follow', 'system'], required: true },
+    post: { type: mongoose.Schema.Types.ObjectId, ref: 'Post' },
+    read: { type: Boolean, default: false }
+  }, { timestamps: true });
+  mongoose.model('Notification', notificationSchema);
+}
+
+exports.getNotifications = async (req, res) => {
   try {
-    const notifications = await Notification.find({ recipient: req.user._id })
-      .populate('sender', 'firstName lastName profilePic role')
+    const notifications = await mongoose.model('Notification').find({ recipient: req.user._id })
+      .populate('sender', 'firstName lastName profilePic')
       .populate('post', 'content')
-      .sort({ createdAt: -1 })
-      .limit(50);
+      .sort({ createdAt: -1 });
     res.json(notifications);
-  } catch (error) {
-    res.status(400).json({ message: error.message });
+  } catch (err) {
+    res.status(500).json({ message: 'Metric retrieval failed' });
   }
 };
 
-const getUnreadCount = async (req, res) => {
+exports.markAsRead = async (req, res) => {
   try {
-    const count = await Notification.countDocuments({ recipient: req.user._id, read: false });
-    res.json({ count });
-  } catch (error) {
-    res.status(400).json({ message: error.message });
+    await mongoose.model('Notification').updateMany({ recipient: req.user._id }, { read: true });
+    res.json({ message: 'Signals cleared' });
+  } catch (err) {
+    res.status(400).json({ message: 'Operation failed' });
   }
 };
-
-const markAsRead = async (req, res) => {
-  try {
-    await Notification.updateMany(
-      { recipient: req.user._id, read: false },
-      { read: true }
-    );
-    res.json({ message: 'All notifications marked as read' });
-  } catch (error) {
-    res.status(400).json({ message: error.message });
-  }
-};
-
-const markOneAsRead = async (req, res) => {
-  try {
-    await Notification.findByIdAndUpdate(req.params.id, { read: true });
-    res.json({ message: 'Notification marked as read' });
-  } catch (error) {
-    res.status(400).json({ message: error.message });
-  }
-};
-
-const deleteNotification = async (req, res) => {
-  try {
-    const notification = await Notification.findById(req.params.id);
-    if (!notification) return res.status(404).json({ message: 'Notification not found' });
-    
-    // Ensure the user deleting it is the recipient
-    if (notification.recipient.toString() !== req.user._id.toString()) {
-      return res.status(403).json({ message: 'Not authorized' });
-    }
-    
-    await notification.deleteOne();
-    res.json({ message: 'Notification removed' });
-  } catch (error) {
-    res.status(400).json({ message: error.message });
-  }
-};
-
-module.exports = { getNotifications, getUnreadCount, markAsRead, markOneAsRead, deleteNotification };

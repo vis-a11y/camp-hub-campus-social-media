@@ -1,40 +1,19 @@
-import axios from 'axios';
-
 /**
- * Normalizes a media URL for production/development environments.
- * Maps legacy localhost URLs and relative paths to the production API base.
- * 
- * @param {string} url - The raw URL or path from the database.
- * @returns {string} - The corrected absolute URL.
+ * HUB MEDIA UTILITY v2.0
+ * Intelligent URL normalization for Cloudinary and Local Fallbacks.
  */
-export const getMediaUrl = (url, name = 'User') => {
-  if (!url || url === '' || url === 'undefined' || url === 'null') {
-    return `https://ui-avatars.com/api/?name=${name.split(' ').join('+')}&background=6366f1&color=fff&bold=true`;
-  }
+export const getMediaUrl = (path) => {
+  if (!path) return '';
   
-  // Use VITE_API_BASE_URL or fallback to current origin for robustness
-  const apiBase = import.meta.env.VITE_API_BASE_URL || axios.defaults.baseURL || 'https://campchat-campus-hub-2.onrender.com';
-  const baseUrl = apiBase.replace(/\/$/, ''); 
-
-  // If it's already an absolute URL (Cloudinary or others)
-  if (url.startsWith('http')) {
-    // 1. Force HTTPS on production URLs to avoid mixed content errors
-    let secureUrl = url.replace(/^http:/, 'https:');
-    
-    // 2. If it's already a Cloudinary or external URL, return it as is
-    if (secureUrl.includes('cloudinary.com') || !secureUrl.includes('localhost')) {
-      return secureUrl;
-    }
-
-    // 3. Map legacy localhost to the current API base
-    if (secureUrl.includes('localhost:')) {
-      const parts = secureUrl.split('/uploads/');
-      if (parts.length > 1) return `${baseUrl}/uploads/${parts[1]}`;
-    }
-    return secureUrl;
-  }
+  // If it's already a full cloud URL, return it
+  if (path.startsWith('http')) return path;
   
-  // 3. Handle relative paths (for local uploads)
-  const cleanUrl = url.startsWith('/') ? url : `/${url}`;
-  return `${baseUrl}${cleanUrl}`;
+  // Clean up relative path
+  const cleanPath = path.startsWith('/') ? path.slice(1) : path;
+  
+  // Production Fallback to Render if not absolute
+  const API_BASE = import.meta.env.VITE_API_BASE_URL || 'https://campchat-campus-hub-2.onrender.com';
+  const baseUrl = API_BASE.replace(/\/$/, '');
+  
+  return `${baseUrl}/${cleanPath}`;
 };

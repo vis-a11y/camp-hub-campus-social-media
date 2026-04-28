@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
-import { Search, Compass, Users, TrendingUp, Zap, MessageSquare, Clock, MapPin, Activity, Heart } from 'lucide-react';
-import PostCard from '../components/PostCard';
+import { Search, Compass, Users, TrendingUp, Zap, MessageSquare, Heart, Sparkles, LayoutGrid } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import { getMediaUrl } from '../utils/media';
@@ -12,9 +11,6 @@ const ExplorePage = () => {
   const navigate = useNavigate();
   const [people, setPeople] = useState([]);
   const [posts, setPosts] = useState([]);
-  // PRODUCTION FAILSAFE: Use hardcoded Render domain if detection fails
-  const apiBase = import.meta.env.VITE_API_BASE_URL || axios.defaults.baseURL || 'https://campchat-campus-hub-2.onrender.com';
-  const baseUrl = apiBase.replace(/\/$/, ''); 
   const [activeTab, setActiveTab] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
@@ -61,120 +57,118 @@ const ExplorePage = () => {
     }
   };
 
-  const handleFollow = async (e, userId) => {
-    e.stopPropagation();
-    try {
-      await axios.put(`/api/auth/users/${userId}/follow`);
-      toast.success('Relationship updated');
-      fetchExploreContent();
-    } catch {
-       toast.error('Operation failed');
-    }
-  };
-
   return (
-    <div className="max-w-[935px] mx-auto px-1 sm:px-4 py-8 sm:py-12 animate-fade-in pb-32 bg-white dark:bg-black min-h-screen">
-      {/* Search Header (Instagram Style) */}
-      <div className="mb-8 px-2">
-        <form onSubmit={handleSearch} className="relative group max-w-full">
-           <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
+    <div className="animate-fade-in space-y-12 pb-20">
+      {/* SEARCH HEADER */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-8">
+        <div className="space-y-2">
+           <h1 className="text-5xl font-black text-slate-900 dark:text-white tracking-tighter uppercase">
+             Discovery <span className="accent-gradient-text italic">Zone</span>
+           </h1>
+           <p className="text-slate-500 font-medium text-lg">Exploring campus signal frequencies...</p>
+        </div>
+        
+        <div className="relative group w-full md:w-[400px]">
+           <Search size={22} className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-500 transition-all" />
            <input 
              value={searchQuery}
              onChange={e => setSearchQuery(e.target.value)}
-             className="w-full bg-slate-100 dark:bg-white/10 border-none rounded-lg pl-12 pr-4 py-2 text-[14px] outline-none transition-all placeholder:text-slate-500 font-normal dark:text-white" 
-             placeholder="Search" 
+             className="premium-input pl-16 py-4 text-lg" 
+             placeholder="Search Hub..." 
            />
-        </form>
+        </div>
       </div>
 
-      {/* Control Tabs (Minimalist) */}
-      <div className="flex gap-8 mb-8 px-2 border-b border-slate-100 dark:border-white/10 overflow-x-auto no-scrollbar">
+      {/* TABS */}
+      <div className="flex gap-10 border-b border-slate-100 dark:border-white/5 overflow-x-auto no-scrollbar">
           {[
-            { id: 'all', label: 'All' },
-            { id: 'people', label: 'Accounts' },
-            { id: 'latest', label: 'Audio' },
-            { id: 'trending', label: 'Trending' }
+            { id: 'all', label: 'All Signals', icon: LayoutGrid },
+            { id: 'people', label: 'Nodes', icon: Users },
+            { id: 'trending', label: 'Trending', icon: TrendingUp }
           ].map(tab => {
              const active = activeTab === tab.id;
              return (
                <button 
                  key={tab.id}
                  onClick={() => setActiveTab(tab.id)}
-                 className={`pb-3 text-[14px] font-semibold transition-all relative ${
-                   active ? 'text-slate-900 dark:text-white border-b-2 border-slate-900 dark:border-white' : 'text-slate-400'
+                 className={`pb-5 text-sm font-black uppercase tracking-[0.2em] transition-all flex items-center gap-2 relative ${
+                   active ? 'text-indigo-500 border-b-4 border-indigo-500' : 'text-slate-400 hover:text-slate-600'
                  }`}
                >
+                  <tab.icon size={18} />
                   {tab.label}
                </button>
              );
           })}
       </div>
 
-      {/* Grid Rendering (Instagram Explore Grid) */}
+      {/* EXPLORE GRID */}
       {loading ? (
-        <div className="grid grid-cols-3 gap-1 sm:gap-4">
-           {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(i => <div key={i} className="aspect-square bg-slate-100 dark:bg-white/5 animate-pulse rounded-sm sm:rounded-md"></div>)}
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+           {[1, 2, 3, 4, 5, 6, 7, 8].map(i => <div key={i} className="aspect-square premium-card animate-pulse"></div>)}
+        </div>
+      ) : activeTab === 'people' ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+           {people.map(p => (
+              <div 
+                key={p._id} 
+                className="premium-card p-6 flex items-center gap-5 cursor-pointer hover:border-indigo-500/30 group transition-all"
+                onClick={() => navigate(`/profile/${p._id}`)}
+              >
+                 <div className="w-16 h-16 rounded-2xl overflow-hidden shadow-xl border-2 border-transparent group-hover:border-indigo-500 transition-all">
+                    {p.profilePic ? (
+                      <img src={getMediaUrl(p.profilePic)} className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="w-full h-full bg-indigo-500 flex items-center justify-center font-black text-white text-xl uppercase">{p.firstName?.[0]}</div>
+                    )}
+                 </div>
+                 <div className="flex-1">
+                    <h4 className="text-lg font-black text-slate-900 dark:text-white tracking-tighter uppercase">{p.firstName} {p.lastName}</h4>
+                    <p className="text-[11px] text-slate-400 font-bold uppercase tracking-widest">{p.role}</p>
+                 </div>
+                 <div className="p-3 bg-indigo-500/5 text-indigo-500 rounded-xl group-hover:bg-indigo-500 group-hover:text-white transition-all">
+                    <Users size={20} />
+                 </div>
+              </div>
+           ))}
         </div>
       ) : (
-        <div>
-           {activeTab === 'people' ? (
-             <div className="space-y-4 px-2">
-                {people.map(p => (
-                   <div key={p._id} className="flex items-center justify-between group cursor-pointer" onClick={() => navigate(`/profile/${p._id}`)}>
-                      <div className="flex items-center gap-4">
-                         <div className="w-12 h-12 rounded-full overflow-hidden border border-slate-200 dark:border-white/10">
-                            {p.profilePic ? <img src={getMediaUrl(p.profilePic)} className="w-full h-full object-cover" /> : <div className="w-full h-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center font-bold text-sky-500 uppercase">{p.firstName?.[0]}</div>}
-                         </div>
-                         <div>
-                            <p className="text-[14px] font-bold text-slate-900 dark:text-white lowercase">{p.firstName}_{p.lastName?.toLowerCase()}</p>
-                            <p className="text-[13px] text-slate-500 font-medium">{p.firstName} {p.lastName} • {p.role}</p>
-                         </div>
-                      </div>
-                      <button 
-                        onClick={(e) => handleFollow(e, p._id)}
-                        className="bg-sky-500 text-white rounded-lg px-6 py-1.5 text-[13px] font-bold hover:opacity-80 transition-all"
-                      >
-                        Follow
-                      </button>
-                   </div>
-                ))}
-             </div>
-           ) : (
-             <div className="grid grid-cols-3 gap-1 sm:gap-7">
-                {posts.length > 0 ? posts.map((post, idx) => (
-                   <div 
-                    key={post._id} 
-                    className={`relative aspect-square cursor-pointer group overflow-hidden bg-slate-100 dark:bg-white/5 ${idx % 10 === 0 ? 'col-span-1 row-span-1 sm:col-span-2 sm:row-span-2' : ''}`}
-                    onClick={() => navigate(`/dashboard?post=${post._id}`)}
-                   >
-                       {post.media ? (
-                           <img 
-                                src={getMediaUrl(post.media)} 
-                                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" 
-                                alt="" 
-                                onError={(e) => { e.target.src = 'https://images.unsplash.com/photo-1541339907198-e08756ebafe3?auto=format&fit=crop&q=80&w=1000'; }}
-                            />
-                       ) : (
-                           <div className="w-full h-full flex flex-col items-center justify-center p-4 text-center">
-                               <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest line-clamp-3">{post.content}</p>
-                           </div>
-                       )}
-                       {/* Hover Overlay */}
-                       <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-6 text-white font-bold">
-                           <div className="flex items-center gap-2">
-                              <Heart size={20} fill="white" /> {post.likes?.length || 0}
-                           </div>
-                           <div className="flex items-center gap-2">
-                              <MessageSquare size={20} fill="white" /> {post.comments?.length || 0}
-                           </div>
-                       </div>
-                   </div>
-                )) : (
-                    <div className="col-span-3 py-48 text-center opacity-20">
-                        <Compass size={64} className="mx-auto mb-4" />
-                        <p className="text-sm font-bold uppercase tracking-widest uppercase">No content discovered</p>
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-8">
+           {posts.length > 0 ? posts.map((post, idx) => (
+              <div 
+                key={post._id} 
+                className={`premium-card relative aspect-square cursor-pointer group overflow-hidden ${idx % 7 === 0 ? 'col-span-2 row-span-2' : ''}`}
+                onClick={() => navigate(`/dashboard?post=${post._id}`)}
+              >
+                  {post.media ? (
+                    <img 
+                      src={getMediaUrl(post.media)} 
+                      className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" 
+                      alt="" 
+                    />
+                  ) : (
+                    <div className="w-full h-full flex flex-col items-center justify-center p-8 text-center bg-indigo-500/5">
+                        <Sparkles size={32} className="text-indigo-500 mb-4 opacity-20" />
+                        <p className="text-sm font-black text-slate-400 uppercase tracking-widest line-clamp-4">{post.content}</p>
                     </div>
-                )}
+                  )}
+                  
+                  {/* OVERLAY */}
+                  <div className="absolute inset-0 bg-indigo-600/60 opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center gap-10 text-white backdrop-blur-sm">
+                      <div className="flex flex-col items-center gap-2 scale-50 group-hover:scale-100 transition-all delay-75">
+                         <Heart size={32} fill="white" />
+                         <span className="text-xl font-black">{post.likes?.length || 0}</span>
+                      </div>
+                      <div className="flex flex-col items-center gap-2 scale-50 group-hover:scale-100 transition-all delay-150">
+                         <MessageSquare size={32} fill="white" />
+                         <span className="text-xl font-black">{post.comments?.length || 0}</span>
+                      </div>
+                  </div>
+              </div>
+           )) : (
+             <div className="col-span-full py-48 text-center opacity-20">
+                <Compass size={80} className="mx-auto mb-6" />
+                <p className="text-2xl font-black uppercase tracking-[0.4em]">Signal Void</p>
              </div>
            )}
         </div>

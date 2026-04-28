@@ -4,11 +4,10 @@ import { useNavigate } from 'react-router-dom';
 
 const AuthContext = createContext();
 
-// SYNCED API BASE: Match App.jsx logic for production stability
+// SYNCED API CORE
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 
   (import.meta.env.DEV ? 'http://localhost:5001' : 'https://campchat-campus-hub-2.onrender.com');
 
-// Ensure axios uses this as default for all calls
 axios.defaults.baseURL = API_BASE_URL;
 
 export const AuthProvider = ({ children }) => {
@@ -17,68 +16,53 @@ export const AuthProvider = ({ children }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const verifySession = async (token) => {
+    const checkSession = async () => {
+      const stored = localStorage.getItem('hub_identity');
+      if (!stored) {
+        setLoading(false);
+        return;
+      }
+
       try {
+        const { token } = JSON.parse(stored);
         axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-        const { data } = await axios.get(`${API_BASE_URL}/auth/me`);
-        setUser(data);
-        localStorage.setItem('campchat_user', JSON.stringify(data));
+        const { data } = await axios.get('/api/auth/me');
+        setUser({ ...data, token });
       } catch (err) {
-        console.warn('Session verification failed, reverting to guest mode');
-        logout();
+        localStorage.removeItem('hub_identity');
+        setUser(null);
       } finally {
         setLoading(false);
       }
     };
-
-    const storedUser = localStorage.getItem('campchat_user');
-    if (storedUser) {
-      try {
-        const parsed = JSON.parse(storedUser);
-        if (parsed && parsed.token) {
-          verifySession(parsed.token);
-          return;
-        }
-      } catch {
-        localStorage.removeItem('campchat_user');
-      }
-    }
-    setLoading(false);
+    checkSession();
   }, []);
 
   const login = async (email, password) => {
-    const { data } = await axios.post(`${API_BASE_URL}/auth/login`, { email, password });
+    const { data } = await axios.post('/api/auth/login', { email, password });
     setUser(data);
-    localStorage.setItem('campchat_user', JSON.stringify(data));
+    localStorage.setItem('hub_identity', JSON.stringify(data));
     axios.defaults.headers.common['Authorization'] = `Bearer ${data.token}`;
-    navigate('/dashboard');
     return true;
   };
 
   const register = async (userData) => {
-    const { data } = await axios.post(`${API_BASE_URL}/auth/register`, userData);
+    const { data } = await axios.post('/api/auth/register', userData);
     setUser(data);
-    localStorage.setItem('campchat_user', JSON.stringify(data));
+    localStorage.setItem('hub_identity', JSON.stringify(data));
     axios.defaults.headers.common['Authorization'] = `Bearer ${data.token}`;
-    navigate('/dashboard');
     return true;
   };
 
   const logout = () => {
     setUser(null);
-    localStorage.removeItem('campchat_user');
+    localStorage.removeItem('hub_identity');
     delete axios.defaults.headers.common['Authorization'];
     navigate('/login');
   };
 
-  const updateUser = (updatedData) => {
-    const merged = { ...user, ...updatedData };
-    setUser(merged);
-    localStorage.setItem('campchat_user', JSON.stringify(merged));
-  };
-
   return (
-    <AuthContext.Provider value={{ user, login, register, logout, loading, updateUser }}>
+    <AuthContext.Provider value={{ user, login, register, logout, loading, setUser }}>
       {!loading && children}
     </AuthContext.Provider>
   );

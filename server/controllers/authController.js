@@ -1,103 +1,113 @@
-const jwt = require('jsonwebtoken');
-const bcrypt = require('bcryptjs'); // Updated: using bcryptjs as per spec
 const User = require('../models/User');
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
 
 const generateToken = (id) => {
-  return jwt.sign({ id }, process.env.JWT_SECRET || 'your_super_secret_jwt_key', { expiresIn: '30d' });
+  return jwt.sign({ id }, process.env.JWT_SECRET || 'your_super_secret_jwt_key', {
+    expiresIn: '30d'
+  });
 };
 
-const safeUser = (user, token) => ({
-  _id: user._id,
-  firstName: user.firstName,
-  lastName: user.lastName,
-  name: `${user.firstName} ${user.lastName}`, 
-  email: user.email,
-  role: user.role,
-  branch: user.branch,
-  year: user.year,
-  bio: user.bio,
-  profilePic: user.profilePic,
-  coverPhoto: user.coverPhoto,
-  reputationScore: user.reputationScore,
-  followers: user.followers,
-  following: user.following,
-  isVerified: user.isVerified,
-  interests: user.interests || [],
-  website: user.website,
-  location: user.location,
-  createdAt: user.createdAt,
-  token,
-});
-
-const registerUser = async (req, res) => {
-  const { firstName, lastName, email, password, role, branch, year } = req.body;
-
+// @desc    RECONSTRUCTED: Identity Creation
+// @route   POST /api/auth/register
+exports.register = async (req, res) => {
   try {
-    const userExists = await User.findOne({ email });
-    if (userExists) {
-      return res.status(400).json({ message: 'User already exists' });
-    }
+    const { email, password, firstName, lastName, role, branch, year } = req.body;
+    
+    const exists = await User.findOne({ email });
+    if (exists) return res.status(400).json({ message: 'Identity already exists' });
 
-    const salt = await bcrypt.genSalt(10);
+    const salt = await bcrypt.genSalt(12);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    const user = await User.create({ 
-      firstName, 
-      lastName, 
-      email, 
-      password: hashedPassword, 
-      role, 
-      branch: branch || 'Computer Science', 
-      year: year || 2026,
-      interests: [],
-      profilePic: `https://ui-avatars.com/api/?name=${firstName}+${lastName}&background=6366f1&color=fff`
+    const user = await User.create({
+      firstName, lastName, email, 
+      password: hashedPassword,
+      role: role || 'student',
+      branch: branch || 'General',
+      year: year || 1
     });
-    
-    res.status(201).json(safeUser(user, generateToken(user._id)));
-  } catch (error) {
-    res.status(400).json({ message: error.message });
+
+    res.status(201).json({
+      _id: user._id,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
+      role: user.role,
+      token: generateToken(user._id)
+    });
+  } catch (err) {
+    res.status(400).json({ message: 'Initialization failed', error: err.message });
   }
 };
 
-const loginUser = async (req, res) => {
-  const { email, password } = req.body;
+// @desc    RECONSTRUCTED: Identity Sync (Login)
+// @route   POST /api/auth/login
+exports.login = async (req, res) => {
   try {
+    const { email, password } = req.body;
     const user = await User.findOne({ email });
+
     if (user && (await bcrypt.compare(password, user.password))) {
-      res.json(safeUser(user, generateToken(user._id)));
+      res.json({
+        _id: user._id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        role: user.role,
+        profilePic: user.profilePic,
+        token: generateToken(user._id)
+      });
     } else {
-      res.status(401).json({ message: 'Invalid email or password' });
+      res.status(401).json({ message: 'Invalid credentials' });
     }
-  } catch (error) {
-    res.status(400).json({ message: error.message });
+  } catch (err) {
+    res.status(400).json({ message: 'Sync failed' });
   }
 };
 
-const getUserProfile = async (req, res) => {
+// @desc    RECONSTRUCTED: Identity Retrieval
+// @route   GET /api/auth/me
+exports.getMe = async (req, res) => {
   try {
-    if (!req.user) {
-      return res.status(401).json({ message: 'Not authorized, no session found' });
-    }
-    const user = await User.findById(req.user._id);
-    if (!user) return res.status(404).json({ message: 'User not found' });
-    res.json(safeUser(user, req.headers.authorization?.split(' ')[1]));
-  } catch (error) {
-    res.status(400).json({ message: error.message });
+    const user = await User.findById(req.user._id).select('-password');
+    res.json(user);
+  } catch (err) {
+    res.status(500).json({ message: 'Retrieval failed' });
   }
 };
 
-const updateUserProfile = async (req, res) => {
+// @desc    RECONSTRUCTED: Global Identity Search
+// @route   GET /api/auth/users
+exports.getUsers = async (req, res) => {
   try {
-    const { firstName, lastName, bio, branch, year, profilePic, coverPhoto, website, location, interests } = req.body;
-    const user = await User.findByIdAndUpdate(
-      req.user._id,
-      { firstName, lastName, bio, branch, year, profilePic, coverPhoto, website, location, interests, updatedAt: Date.now() },
-      { new: true, runValidators: true }
-    );
-    res.json(safeUser(user, req.headers.authorization?.split(' ')[1]));
-  } catch (error) {
-    res.status(400).json({ message: error.message });
+    const users = await User.find({ _id: { $ne: req.user._id } }).select('firstName lastName profilePic role');
+    res.json(users);
+  } catch (err) {
+    res.status(500).json({ message: 'Scan failed' });
   }
 };
 
-module.exports = { registerUser, loginUser, getUserProfile, updateUserProfile };
+// @desc    RECONSTRUCTED: Update Identity Visuals
+// @route   PUT /api/auth/profile-pic
+exports.updateProfilePic = async (req, res) => {
+  try {
+    if (!req.file) return res.status(400).json({ message: 'No media received' });
+    
+    const url = req.file.path || req.file.filename;
+    await User.findByIdAndUpdate(req.user._id, { profilePic: url });
+    
+    res.json({ profilePic: url });
+  } catch (err) {
+    res.status(400).json({ message: 'Update failed' });
+  }
+};
+
+exports.getUserById = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id).select('-password');
+    res.json(user);
+  } catch (err) {
+    res.status(404).json({ message: 'Node not found' });
+  }
+};

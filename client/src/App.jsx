@@ -16,109 +16,92 @@ import ProjectsPage from './pages/ProjectsPage';
 import Navbar from './components/ui/Navbar';
 import Sidebar from './components/Sidebar';
 import BottomNav from './components/BottomNav';
-import toast, { Toaster } from 'react-hot-toast';
+import { Toaster } from 'react-hot-toast';
 import axios from 'axios';
 
-// POINTED TO REAL-TIME BACKEND
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || (import.meta.env.DEV ? 'http://localhost:5001' : 'https://campchat-campus-hub-2.onrender.com');
+// PRODUCTION SYNC
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 
+  (import.meta.env.DEV ? 'http://localhost:5001' : 'https://campchat-campus-hub-2.onrender.com');
 axios.defaults.baseURL = API_BASE_URL;
-axios.defaults.withCredentials = true; // Crucial for session cookies
-
-// Global Response Interceptor
-axios.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    if (error.response?.status === 401) {
-      console.warn('Session expired or unauthorized');
-    }
-    if (!error.response) {
-      toast.error('Network Error: Connectivity with Hub lost', { id: 'network-err' });
-    }
-    return Promise.reject(error);
-  }
-);
-
-if (import.meta.env.DEV) {
-  console.log('🚀 API Base URL:', API_BASE_URL);
-}
-
-const ProtectedRoute = ({ children }) => {
-  const { user, loading } = useAuth();
-  
-  if (loading) return null;
-  
-  if (!user) {
-    return <Navigate to="/login" replace />;
-  }
-
-  return children; 
-};
+axios.defaults.withCredentials = true;
 
 /**
- * MainLayout: Only rendered for protected application routes.
- * This is the ultimate guard against sidebar overlap on login pages.
+ * THE VAULT: APP GALAXY LAYOUT
+ * Physically contains the Sidebar and Navbar.
  */
-const MainLayout = ({ user }) => {
+const AppGalaxy = () => {
+  const { user } = useAuth();
+  
   return (
-    <div className="flex relative min-h-screen">
-      {/* SIDEBAR: Only exists in this layout */}
+    <div className="flex relative min-h-screen bg-white dark:bg-[#020617]">
+      {/* Sidebar is physically nested only inside this branch */}
       <Sidebar />
       
-      {/* Main Content Layout */}
-      <div className="flex-1 flex flex-col transition-all duration-300 xl:ml-[280px] lg:ml-[85px] ml-0">
-        {/* Mobile Top Navbar */}
-        <div className="lg:hidden sticky top-0 bg-white/80 dark:bg-black/80 backdrop-blur-md z-40 border-b border-slate-100 dark:border-white/5">
+      <div className="flex-1 flex flex-col xl:ml-[280px] lg:ml-[85px] ml-0">
+        <div className="lg:hidden sticky top-0 z-40">
           <Navbar />
         </div>
         
-        <main className="flex-1 max-w-[1440px] mx-auto w-full px-0 md:px-8 py-0 md:py-10 pb-32">
+        <main className="flex-1 max-w-[1440px] mx-auto w-full p-4 md:p-8 lg:p-12 pb-32">
           <Outlet />
         </main>
         
-        {/* Mobile Bottom Navigation */}
         <div className="lg:hidden">
-           <BottomNav />
+          <BottomNav />
         </div>
       </div>
     </div>
   );
 };
 
-function AppRoutes() {
+/**
+ * THE VAULT: AUTH GALAXY LAYOUT
+ * Absolutely zero navigation elements. 
+ */
+const AuthGalaxy = () => {
+  return (
+    <div className="min-h-screen bg-[#020617] relative overflow-hidden">
+      <Outlet />
+    </div>
+  );
+};
+
+const AppRoutes = () => {
   const { user, loading } = useAuth();
   
   if (loading) return null;
 
   return (
-    <div className="min-h-screen bg-white dark:bg-slate-950 font-sans selection:bg-indigo-500/10 overflow-x-hidden">
+    <>
       <Toaster position="bottom-left" />
-      
       <Routes>
-        {/* 1. AUTH BRANCH: Completely isolated from Sidebar/Navbar */}
-        <Route path="/login"    element={user ? <Navigate to="/dashboard" replace /> : <div className="auth-wrapper"><LoginPage /></div>} />
-        <Route path="/register" element={user ? <Navigate to="/dashboard" replace /> : <div className="auth-wrapper"><RegisterPage /></div>} />
-        
-        {/* 2. APP BRANCH: Only renders if user is authenticated */}
-        <Route element={user ? <MainLayout user={user} /> : <Navigate to="/login" replace />}>
-          <Route path="/dashboard"     element={<Dashboard />} />
-          <Route path="/profile"       element={<ProfilePage />} />
-          <Route path="/profile/:id"   element={<ProfilePage />} />
-          <Route path="/study-groups"  element={<StudyGroups />} />
-          <Route path="/chats"         element={<ChatSystem />} />
-          <Route path="/explore"       element={<ExplorePage />} />
-          <Route path="/notifications" element={<NotificationsPage />} />
-          <Route path="/connections"   element={<ConnectionsPage />} />
-          <Route path="/events"        element={<EventsPage />} />
-          <Route path="/projects"      element={<ProjectsPage />} />
-        </Route>
-
-        {/* 3. FALLBACKS */}
-        <Route path="/" element={<Navigate to={user ? "/dashboard" : "/login"} replace />} />
-        <Route path="*" element={<Navigate to="/" replace />} />
+        {/* BRANCH 1: AUTHENTICATION (NO SIDEBAR) */}
+        {!user ? (
+          <Route element={<AuthGalaxy />}>
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/register" element={<RegisterPage />} />
+            <Route path="*" element={<Navigate to="/login" replace />} />
+          </Route>
+        ) : (
+          /* BRANCH 2: APPLICATION (WITH SIDEBAR) */
+          <Route element={<AppGalaxy />}>
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/profile/:id" element={<ProfilePage />} />
+            <Route path="/study-groups" element={<StudyGroups />} />
+            <Route path="/chats" element={<ChatSystem />} />
+            <Route path="/explore" element={<ExplorePage />} />
+            <Route path="/notifications" element={<NotificationsPage />} />
+            <Route path="/connections" element={<ConnectionsPage />} />
+            <Route path="/events" element={<EventsPage />} />
+            <Route path="/projects" element={<ProjectsPage />} />
+            <Route path="*" element={<Navigate to="/dashboard" replace />} />
+          </Route>
+        )}
       </Routes>
-    </div>
+    </>
   );
-}
+};
 
 function App() {
   return (

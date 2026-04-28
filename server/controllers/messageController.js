@@ -1,50 +1,39 @@
-const Message = require("../models/Message");
-const User = require("../models/User");
-const Chat = require("../models/Chat");
+const Message = require('../models/Message');
+const User = require('../models/User');
+const Chat = require('../models/Chat');
 
-const allMessages = async (req, res) => {
+exports.allMessages = async (req, res) => {
   try {
     const messages = await Message.find({ chat: req.params.chatId })
-      .populate("sender", "firstName lastName profilePic email")
-      .populate("chat");
+      .populate('sender', 'firstName lastName profilePic email')
+      .populate('chat');
     res.json(messages);
   } catch (error) {
-    res.status(400);
-    throw new Error(error.message);
+    res.status(400).json({ message: error.message });
   }
 };
 
-const sendMessage = async (req, res) => {
+exports.sendMessage = async (req, res) => {
   const { content, chatId } = req.body;
-
-  if (!content || !chatId) {
-    console.log("Invalid data passed into request");
-    return res.sendStatus(400);
-  }
-
-  var newMessage = {
-    sender: req.user._id,
-    content: content,
-    chat: chatId,
-  };
+  if (!content || !chatId) return res.status(400).json({ message: 'Invalid data' });
 
   try {
-    var message = await Message.create(newMessage);
+    let message = await Message.create({
+      sender: req.user._id,
+      content: content,
+      chat: chatId,
+    });
 
-    message = await message.populate("sender", "firstName lastName profilePic");
-    message = await message.populate("chat");
+    message = await message.populate('sender', 'firstName lastName profilePic');
+    message = await message.populate('chat');
     message = await User.populate(message, {
-      path: "chat.users",
-      select: "firstName lastName profilePic email",
+      path: 'chat.users',
+      select: 'firstName lastName profilePic email',
     });
 
     await Chat.findByIdAndUpdate(req.body.chatId, { latestMessage: message });
-
     res.json(message);
   } catch (error) {
-    res.status(400);
-    throw new Error(error.message);
+    res.status(400).json({ message: error.message });
   }
 };
-
-module.exports = { allMessages, sendMessage };
