@@ -1,32 +1,25 @@
 import React, { useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
-import {
-  Home, Compass, MessageSquare, Calendar, Users, Activity, User, LogOut, 
-  Settings, Bookmark, Menu, Plus, Zap, ChevronRight
+import { NavLink, useLocation, useNavigate } from 'react-router-dom';
+import { 
+  Home, Compass, MessageSquare, Calendar, Users, Activity, UserCircle, 
+  Settings, LogOut, Plus, ChevronRight, Zap, Layers, Sparkles
 } from 'lucide-react';
-import ThemeToggle from './ui/ThemeToggle';
-import { getMediaUrl } from '../utils/media';
+import { useAuth } from '../context/AuthContext';
 
 const Sidebar = () => {
-  const navigate = useNavigate();
-  const location = useLocation();
   const { user, logout } = useAuth();
-  const [showMore, setShowMore] = useState(false);
-
-  const currentPath = (location.pathname || window.location.pathname || '').toLowerCase();
-  const isAuthPage = currentPath.includes('login') || currentPath.includes('register');
-
-  if (isAuthPage || !user) return null;
+  const location = useLocation();
+  const navigate = useNavigate();
+  const [isHovered, setIsHovered] = useState(null);
 
   const menuItems = [
     { icon: Home,          label: 'Feed',          path: '/dashboard' },
     { icon: Compass,       label: 'Discovery',     path: '/explore' },
-    { icon: MessageSquare, label: 'Messages',      path: '/chats', hasNew: true },
+    { icon: MessageSquare, label: 'Messages',      path: '/chats' },
     { icon: Calendar,      label: 'Experiences',   path: '/events' },
-    { icon: Users,         label: 'Societies',     path: '/study-groups' },
-    { icon: Activity,      label: 'Analytics',     path: '/notifications' },
-    { icon: User,          label: 'Identity',      path: '/profile' },
+    { icon: Users,         label: 'Societies',     path: '/connections' },
+    { icon: Activity,      label: 'Analytics',     path: '/projects' },
+    { icon: UserCircle,    label: 'Identity',      path: '/profile' },
   ];
 
   const isActive = (path) => {
@@ -35,30 +28,37 @@ const Sidebar = () => {
   };
 
   return (
-    <div className="hidden lg:flex fixed left-0 top-0 bottom-0 w-[85px] xl:w-[280px] bg-white dark:bg-slate-950 border-r border-slate-200 dark:border-white/5 p-4 xl:p-8 flex-col z-[100] transition-all duration-300 overflow-y-auto no-scrollbar">
-      {/* Premium Campus Logo */}
-      <div className="py-10 px-4 mb-2 select-none cursor-pointer flex items-center gap-3 group" onClick={() => navigate('/dashboard')}>
-        <div className="w-10 h-10 accent-gradient-bg rounded-xl flex items-center justify-center text-white shadow-lg shadow-indigo-500/20 group-hover:rotate-12 transition-transform duration-300">
-           <Zap size={22} fill="white" />
+    <div className="hidden lg:flex fixed left-0 top-0 bottom-0 w-[85px] xl:w-[280px] bg-white dark:bg-[#030711] border-r border-slate-200 dark:border-white/5 p-4 xl:p-8 flex-col z-[100] transition-all duration-500 ease-out shadow-2xl dark:shadow-none no-scrollbar">
+      {/* Premium Logo Area */}
+      <div className="flex items-center gap-4 mb-12 xl:px-2 group cursor-pointer" onClick={() => navigate('/dashboard')}>
+        <div className="w-12 h-12 accent-gradient-bg rounded-2xl flex items-center justify-center text-white shadow-xl shadow-indigo-500/20 group-hover:scale-110 group-hover:rotate-12 transition-all duration-500">
+          <Zap size={24} fill="white" strokeWidth={0} />
         </div>
-        <h1 className="text-2xl font-black xl:block hidden text-slate-900 dark:text-white uppercase tracking-tighter">
-           Campus <span className="accent-gradient-text">Hub</span>
-        </h1>
+        <div className="hidden xl:block">
+          <h1 className="text-xl font-black text-slate-900 dark:text-white uppercase tracking-tighter leading-none">
+            Campus <br /><span className="accent-gradient-text">Hub</span>
+          </h1>
+        </div>
       </div>
-      
-      {/* Navigation Space */}
-      <nav className="flex-1 flex flex-col gap-2">
-        {menuItems.map(item => (
-          <button
-            key={item.label}
-            onClick={() => navigate(item.path)}
-            className={`w-full flex items-center gap-5 px-5 py-4 rounded-2xl transition-all duration-300 group/item relative overflow-hidden ${
-              isActive(item.path) 
-              ? 'text-indigo-600 dark:text-indigo-400 bg-indigo-500/5 dark:bg-indigo-500/10' 
-              : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-white/5'
-            }`}
+
+      {/* Navigation Links */}
+      <nav className="flex-1 space-y-2">
+        <p className="hidden xl:block text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] mb-6 ml-2 opacity-50">Main Operations</p>
+        {menuItems.map((item, idx) => (
+          <NavLink
+            key={idx}
+            to={item.path}
+            onMouseEnter={() => setIsHovered(idx)}
+            onMouseLeave={() => setIsHovered(null)}
+            className={() => `
+              group flex items-center gap-4 px-4 py-3.5 rounded-2xl transition-all duration-300 relative overflow-hidden
+              ${isActive(item.path) 
+                ? 'bg-indigo-500/10 dark:bg-indigo-500/5 text-indigo-600 dark:text-indigo-400' 
+                : 'text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-white/5 hover:text-slate-900 dark:hover:text-white'
+              }
+            `}
           >
-            {/* Active Indicator Bar */}
+            {/* Active Indicator Line */}
             {isActive(item.path) && (
                <div className="absolute left-0 top-1/4 bottom-1/4 w-1 accent-gradient-bg rounded-r-full shadow-lg"></div>
             )}

@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import PostCard from '../components/PostCard';
 import StoriesBar from '../components/StoriesBar';
 import { 
-  TrendingUp, Clock, HelpCircle, Zap, Activity, Info, Rocket, ChevronRight, Image as ImageIcon, Plus, Terminal, X, Camera, Sparkles, MessageSquare, PlusSquare, Search
+  TrendingUp, Clock, HelpCircle, Zap, Activity, Info, Rocket, ChevronRight, Image as ImageIcon, Plus, Terminal, X, Camera, Sparkles, MessageSquare, PlusSquare, Search, Award
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -63,7 +63,6 @@ const Dashboard = () => {
   const fetchSuggestions = async () => {
     try {
       const { data } = await axios.get('/api/auth/users');
-      // Filter out self and pick 5 random
       const filtered = data.filter(u => u._id !== user?._id).slice(0, 5);
       setSuggestions(filtered);
     } catch {
@@ -95,7 +94,7 @@ const Dashboard = () => {
       }
       
       await axios.post('/api/academic/posts', { 
-        content: postText || ' ', // Space fallback if no caption to pass DB validation seamlessly
+        content: postText || ' ', 
         media: mediaUrl,
         mediaType: selectedFile ? (selectedFile.type.startsWith('video/') ? 'video' : 'image') : 'image',
         music: selectedMusic,
@@ -125,7 +124,6 @@ const Dashboard = () => {
     }
   };
 
-
   return (
     <>
     <div className="max-w-[1440px] mx-auto px-4 md:px-8 xl:px-12 py-10 animate-fade-in pb-32">
@@ -133,68 +131,71 @@ const Dashboard = () => {
            {/* Left: Main Feed Content */}
            <div className="feed-main">
               {/* Stories Reel Area */}
-              <StoriesBar />
+              <div className="mb-12">
+                <StoriesBar />
+              </div>
 
-              {/* Static Premium Post Signal Box */}
+              {/* Premium Post Signal Box */}
               <div 
-                className="premium-card p-5 mb-8 flex items-center gap-4 bg-slate-50/50 dark:bg-white/5 cursor-pointer hover:border-indigo-500/50 transition-all group"
+                className="premium-card p-6 mb-12 flex items-center gap-6 bg-white dark:bg-white/5 cursor-pointer hover:border-indigo-500/30 transition-all group overflow-hidden relative"
                 onClick={() => setShowCreateModal(true)}
               >
-                 <div className="w-12 h-12 rounded-2xl overflow-hidden shadow-md border-2 border-white dark:border-slate-800">
+                 <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/5 blur-3xl -z-10 group-hover:bg-indigo-500/10 transition-colors"></div>
+                 <div className="w-14 h-14 rounded-2xl overflow-hidden shadow-xl border-2 border-white dark:border-slate-800 shrink-0">
                     {user?.profilePic ? (
                       <img 
                         src={getMediaUrl(user.profilePic)} 
                         className="w-full h-full object-cover" 
-                        onError={(e) => { e.target.src = `https://ui-avatars.com/api/?name=${user.firstName}+${user.lastName}&background=6366f1&color=fff&bold=true`; }}
+                        alt=""
                       />
                     ) : (
-                      <div className="w-full h-full bg-indigo-500 flex items-center justify-center font-bold text-white uppercase text-lg">{user?.firstName?.[0] || '?'}</div>
+                      <div className="w-full h-full bg-indigo-500 flex items-center justify-center font-bold text-white uppercase text-xl">{user?.firstName?.[0] || '?'}</div>
                     )}
                  </div>
-                 <div className="flex-1 px-5 py-3 bg-white dark:bg-slate-900/40 rounded-2xl border border-slate-100 dark:border-white/5 text-slate-400 font-medium text-[13px] group-hover:text-slate-600 dark:group-hover:text-slate-200 transition-colors">
-                    Share an academic signal or thought, {user?.firstName || 'Explorer'}...
+                 <div className="flex-1 px-6 py-4 bg-slate-50 dark:bg-black/20 rounded-2xl border border-slate-100 dark:border-white/5 text-slate-400 font-bold text-[14px] group-hover:text-slate-600 dark:group-hover:text-slate-200 transition-colors">
+                    Tell the hub something interesting, {user?.firstName || 'Explorer'}...
                  </div>
-                 <div className="w-12 h-12 rounded-2xl bg-indigo-500 text-white flex items-center justify-center shadow-xl shadow-indigo-500/20 group-hover:scale-110 transition-transform active:scale-95">
-                    <PlusSquare size={22} strokeWidth={2.5} />
+                 <div className="w-14 h-14 rounded-2xl bg-indigo-500 text-white flex items-center justify-center shadow-2xl shadow-indigo-500/30 group-hover:scale-105 transition-all group-hover:rotate-12">
+                    <PlusSquare size={24} strokeWidth={2.5} />
                  </div>
               </div>
 
-              {/* Filtering Tabs - Modern Style */}
-              <div className="flex items-center gap-8 mb-8 pb-4 border-b border-slate-200 dark:border-white/5 mx-2">
+              {/* Filtering Tabs */}
+              <div className="flex items-center gap-10 mb-10 pb-4 border-b border-slate-200 dark:border-white/5 mx-2">
                  {[
-                   { id: 'latest',   label: 'Recent Feed',   icon: Clock },
+                   { id: 'latest',   label: 'Sync Feed',   icon: Clock },
                    { id: 'trending', label: 'Trending', icon: TrendingUp }
                  ].map(tab => (
                    <button 
                      key={tab.id}
                      onClick={() => setActiveTab(tab.id)}
-                     className={`group flex items-center gap-2.5 transition-all relative py-2 ${
-                        activeTab === tab.id ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-200'
+                     className={`group flex items-center gap-3 transition-all relative py-2 ${
+                        activeTab === tab.id ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-400 hover:text-slate-900 dark:hover:text-white'
                      }`}
                    >
-                      <tab.icon size={18} className={activeTab === tab.id ? 'animate-pulse' : ''} />
-                      <span className="text-sm font-bold tracking-tight uppercase">{tab.label}</span>
+                      <tab.icon size={20} className={activeTab === tab.id ? 'animate-pulse' : ''} />
+                      <span className="text-sm font-black uppercase tracking-widest">{tab.label}</span>
                       {activeTab === tab.id && (
-                        <div className="absolute -bottom-4 left-0 right-0 h-1 accent-gradient-bg rounded-t-full shadow-[0_-4px_10px_rgba(99,102,241,0.3)]"></div>
+                        <div className="absolute -bottom-4 left-0 right-0 h-1.5 accent-gradient-bg rounded-t-full shadow-[0_0_15px_rgba(99,102,241,0.5)]"></div>
                       )}
                    </button>
                  ))}
               </div>
 
-              <div className="space-y-8">
+              <div className="space-y-12">
                 {loading ? (
                    [1, 2].map(i => (
-                     <div key={i} className="h-[500px] w-full bg-slate-100 dark:bg-slate-900 animate-pulse rounded-3xl border border-slate-200 dark:border-white/5"></div>
+                     <div key={i} className="h-[600px] w-full bg-slate-100 dark:bg-white/5 animate-pulse rounded-3xl"></div>
                    ))
                 ) : posts.length > 0 ? (
                    posts.map(post => <PostCard key={post._id} post={post} onDelete={() => fetchPosts()} />)
                 ) : (
-                   <div className="py-40 text-center opacity-40 flex flex-col items-center">
-                      <div className="w-20 h-20 bg-slate-100 dark:bg-white/5 rounded-full flex items-center justify-center mb-6">
-                        <Activity size={32} />
+                   <div className="py-40 text-center flex flex-col items-center">
+                      <div className="w-24 h-24 bg-slate-100 dark:bg-white/5 rounded-3xl flex items-center justify-center mb-8 border border-slate-200 dark:border-white/10">
+                        <Activity size={40} className="text-slate-300" />
                       </div>
-                      <p className="text-sm font-bold uppercase tracking-[0.4em] text-slate-500">End of Feed</p>
-                      <button onClick={fetchPosts} className="mt-6 text-indigo-500 font-bold hover:underline">Refresh Content</button>
+                      <p className="text-[12px] font-black uppercase tracking-[0.5em] text-slate-400">Hub is quiet right now</p>
+                      <button onClick={fetchPosts} className="mt-8 text-indigo-500 font-black hover:underline uppercase tracking-widest text-[11px]">Reconnect to Sync</button>
                    </div>
                 )}
               </div>
@@ -202,84 +203,80 @@ const Dashboard = () => {
 
            {/* Right: Premium Sidebar */}
            <div className="feed-side hidden lg:block">
-              <div className="sticky top-28 space-y-8">
+              <div className="sticky top-28 space-y-10">
                  {/* Current User Card */}
-                 <div className="premium-card p-6 bg-slate-50/50 dark:bg-white/5">
+                 <div className="premium-card p-8 bg-white dark:bg-white/5 relative overflow-hidden group">
+                    <div className="absolute -top-12 -right-12 w-32 h-32 bg-indigo-500/10 blur-3xl rounded-full group-hover:scale-150 transition-transform duration-700"></div>
                     {user ? (
-                       <div className="flex items-center gap-4">
+                       <div className="flex flex-col items-center text-center">
                           <div 
-                            className="w-16 h-16 rounded-2xl campus-story-ring p-1 shadow-lg cursor-pointer group overflow-hidden" 
+                            className="w-24 h-24 rounded-3xl campus-story-ring p-1 shadow-2xl cursor-pointer group mb-6 overflow-hidden transition-all duration-500 hover:scale-105" 
                             onClick={() => navigate('/profile')}
                           >
-                             <div className="w-full h-full rounded-2xl overflow-hidden border-2 border-white dark:border-slate-800">
+                             <div className="w-full h-full rounded-2xl overflow-hidden border-4 border-white dark:border-slate-900">
                                 {user.profilePic ? (
                                   <img 
                                     src={getMediaUrl(user.profilePic)} 
                                     className="w-full h-full object-cover transition-transform group-hover:scale-110" 
-                                    onError={(e) => { e.target.src = `https://ui-avatars.com/api/?name=${user.firstName}+${user.lastName}&background=6366f1&color=fff&bold=true`; }}
+                                    alt=""
                                   />
                                 ) : (
-                                  <div className="w-full h-full bg-indigo-500 flex items-center justify-center font-bold text-2xl text-white uppercase">{user.firstName?.[0]}</div>
+                                  <div className="w-full h-full bg-indigo-500 flex items-center justify-center font-bold text-3xl text-white uppercase">{user.firstName?.[0]}</div>
                                 )}
                              </div>
                           </div>
-                          <div className="flex-1">
-                             <p className="text-[16px] font-bold text-slate-900 dark:text-white leading-tight">
-                               {user.firstName} {user.lastName}
-                             </p>
-                             <p className="text-[13px] text-slate-500 font-medium">@{user.firstName?.toLowerCase()}_{user.lastName?.toLowerCase()}</p>
+                          <h3 className="text-xl font-black text-slate-900 dark:text-white uppercase tracking-tighter">
+                            {user.firstName} {user.lastName}
+                          </h3>
+                          <p className="text-[12px] text-indigo-500 font-black uppercase tracking-widest mt-1">@{user.firstName?.toLowerCase()}_{user.lastName?.toLowerCase()}</p>
+                          
+                          <div className="w-full grid grid-cols-2 gap-4 mt-8 pt-8 border-t border-slate-100 dark:border-white/5">
+                             <div className="text-center">
+                                <p className="text-lg font-black text-slate-900 dark:text-white">{user?.friends?.length || 0}</p>
+                                <p className="text-[9px] uppercase font-black text-slate-400 tracking-widest">SQUAD</p>
+                             </div>
+                             <div className="text-center">
+                                <p className="text-lg font-black text-slate-900 dark:text-white uppercase">{user?.role || 'STUDENT'}</p>
+                                <p className="text-[9px] uppercase font-black text-slate-400 tracking-widest">RANK</p>
+                             </div>
                           </div>
                        </div>
                     ) : (
-                       <div className="flex items-center gap-4">
-                          <div className="w-12 h-12 rounded-xl bg-slate-100 dark:bg-white/5 flex items-center justify-center text-slate-400">
-                             <Zap size={24} />
-                          </div>
-                          <div className="flex-1">
-                             <p className="text-[15px] font-bold text-slate-900 dark:text-white leading-none">Guest Explorer</p>
-                             <button onClick={() => navigate('/login')} className="text-[12px] text-indigo-500 font-bold hover:underline mt-1">Sign in to sync</button>
-                          </div>
+                       <div className="flex flex-col items-center py-10">
+                          <Zap size={48} className="text-indigo-500 mb-6" />
+                          <p className="text-lg font-black text-slate-900 dark:text-white mb-2 uppercase">GUEST NODE</p>
+                          <button onClick={() => navigate('/login')} className="premium-button py-2 px-8 text-[10px]">SYNC NOW</button>
                        </div>
                     )}
-                    <div className="mt-6 pt-6 border-t border-slate-200 dark:border-white/5 flex justify-between items-center">
-                       <div className="text-center flex-1 border-r border-slate-200 dark:border-white/5">
-                          <p className="text-sm font-bold text-slate-900 dark:text-white">{user?.friends?.length || 0}</p>
-                          <p className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Friends</p>
-                       </div>
-                       <div className="text-center flex-1">
-                          <p className="text-sm font-bold text-slate-900 dark:text-white">{user?.role || 'Student'}</p>
-                          <p className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Rank</p>
-                       </div>
-                    </div>
                  </div>
 
                  {/* Suggestions Hub */}
-                 <div className="premium-card p-6">
-                    <div className="flex items-center justify-between mb-6">
-                       <h4 className="text-[14px] font-bold text-slate-900 dark:text-white">People to Meet</h4>
-                       <button className="text-[12px] font-bold text-indigo-500 hover:text-indigo-600">See all</button>
+                 <div className="premium-card p-8">
+                    <div className="flex items-center justify-between mb-8">
+                       <h4 className="text-[12px] font-black text-slate-900 dark:text-white uppercase tracking-widest">Discovery Hub</h4>
+                       <Award size={18} className="text-indigo-500" />
                     </div>
                     
-                    <div className="space-y-5">
+                    <div className="space-y-6">
                         {suggestions.map(s => (
                            <div key={s._id} className="flex items-center justify-between group">
-                              <div className="flex items-center gap-3 cursor-pointer" onClick={() => navigate(`/profile/${s._id}`)}>
-                                 <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-white/5 flex items-center justify-center text-xs font-bold text-indigo-500 uppercase overflow-hidden border border-slate-100 dark:border-white/5">
+                              <div className="flex items-center gap-4 cursor-pointer" onClick={() => navigate(`/profile/${s._id}`)}>
+                                 <div className="w-12 h-12 rounded-2xl bg-slate-100 dark:bg-white/5 flex items-center justify-center text-sm font-black text-indigo-500 uppercase overflow-hidden border border-slate-200 dark:border-white/10 group-hover:border-indigo-500/50 transition-all">
                                     {s.profilePic ? (
                                       <img 
                                         src={getMediaUrl(s.profilePic)} 
                                         className="w-full h-full object-cover" 
-                                        onError={(e) => { e.target.src = `https://ui-avatars.com/api/?name=${s.firstName}+${s.lastName}&background=6366f1&color=fff&bold=true`; }}
+                                        alt=""
                                       />
                                     ) : s.firstName?.[0]}
                                  </div>
                                  <div>
-                                    <p className="text-[13px] font-bold text-slate-900 dark:text-white group-hover:text-indigo-500 transition-colors uppercase tracking-tight">{s.firstName} {s.lastName?.[0]}.</p>
-                                    <p className="text-[11px] text-slate-400 mt-0.5">{s.branch || 'Campus Student'}</p>
+                                    <p className="text-[14px] font-black text-slate-900 dark:text-white group-hover:text-indigo-500 transition-colors uppercase tracking-tight leading-none mb-1">{s.firstName} {s.lastName?.[0]}.</p>
+                                    <p className="text-[11px] text-slate-400 font-bold uppercase tracking-widest">{s.branch?.split(' ')[0] || 'CAMPUS'}</p>
                                  </div>
                               </div>
-                              <button onClick={(e) => { e.stopPropagation(); handleFollow(s._id); }} className="p-2 bg-indigo-500/10 hover:bg-indigo-500 text-indigo-600 hover:text-white rounded-lg transition-all active:scale-90">
-                                <Plus size={16} strokeWidth={3} />
+                              <button onClick={(e) => { e.stopPropagation(); handleFollow(s._id); }} className="w-10 h-10 bg-indigo-500/10 hover:bg-indigo-500 text-indigo-600 hover:text-white rounded-xl transition-all active:scale-90 flex items-center justify-center shadow-lg hover:shadow-indigo-500/20">
+                                <Plus size={18} strokeWidth={3} />
                               </button>
                            </div>
                         ))}
@@ -287,138 +284,101 @@ const Dashboard = () => {
                  </div>
 
                  {/* Premium Quick Footer */}
-                 <div className="p-2 opacity-50 space-y-4">
-                    <div className="flex flex-wrap gap-x-4 gap-y-2">
-                       {['Directory', 'Library', 'Safety', 'Policies', 'Feedback', 'Careers'].map(l => (
-                          <a key={l} href="#" className="text-[11px] font-semibold text-slate-500 hover:text-indigo-500 transition-all">{l}</a>
+                 <div className="p-4 opacity-40 space-y-6 border-l-2 border-slate-100 dark:border-white/5 ml-4">
+                    <div className="flex flex-wrap gap-x-6 gap-y-3">
+                       {['DIRECTORY', 'ARCHIVE', 'SAFETY', 'POLICIES', 'CORE'].map(l => (
+                          <a key={l} href="#" className="text-[10px] font-black text-slate-500 hover:text-indigo-500 transition-all tracking-widest">{l}</a>
                        ))}
                     </div>
-                    <p className="text-[10px] font-bold text-slate-400 tracking-widest uppercase">© 2026 Academic Hub • CampChat OS</p>
+                    <p className="text-[9px] font-black text-slate-400 tracking-[0.3em] uppercase">© 2026 HUB OS • ESTABLISHED FOR EXCELLENCE</p>
                  </div>
               </div>
            </div>
         </div>
 
-        {/* Global Create CTA (Floating Action Button style but desktop visible) */}
-        {!showCreateModal && (
-          <button 
-            onClick={() => setShowCreateModal(true)}
-            className="fixed bottom-10 right-10 w-16 h-16 accent-gradient-bg rounded-2xl shadow-2xl flex items-center justify-center text-white hover:scale-110 active:scale-90 transition-all z-50 animate-bounce cursor-pointer group"
-          >
-             <Plus size={32} strokeWidth={3} className="group-hover:rotate-90 transition-transform duration-300" />
-          </button>
-        )}
-     </div>
+        {/* Create Modal */}
+        {showCreateModal && (
+          <div className="modal-backdrop px-4">
+             <div className="bg-white dark:bg-[#0a0d17] w-full max-w-[650px] rounded-[32px] shadow-[0_40px_100px_-15px_rgba(0,0,0,0.5)] overflow-hidden border border-slate-200 dark:border-white/10 flex flex-col h-[750px] animate-scale-in">
+                <div className="p-6 border-b border-slate-200 dark:border-white/10 flex justify-between items-center bg-slate-50/50 dark:bg-white/5">
+                   <button onClick={() => setShowCreateModal(false)} className="w-12 h-12 flex items-center justify-center hover:bg-slate-200 dark:hover:bg-white/10 rounded-2xl transition-all"><X size={24} /></button>
+                   <h3 className="text-xl font-black text-slate-900 dark:text-white uppercase tracking-tighter">Signal Output</h3>
+                   <button 
+                     onClick={handleCreatePost}
+                     disabled={!postText.trim() && !imagePreview}
+                     className="premium-button py-2.5 px-8 disabled:opacity-30"
+                   >
+                     Publish
+                   </button>
+                </div>
+                
+                <div className="flex-1 flex flex-col overflow-y-auto no-scrollbar">
+                   {/* Media Upload Area */}
+                   <div className="w-full h-[450px] bg-slate-50 dark:bg-black/40 flex items-center justify-center relative border-b border-slate-200 dark:border-white/5 overflow-hidden">
+                      {!imagePreview ? (
+                         <label className="flex flex-col items-center gap-6 cursor-pointer hover:scale-105 transition-all p-12 text-center group">
+                            <div className="w-24 h-24 bg-indigo-500/10 rounded-[32px] flex items-center justify-center text-indigo-500 mb-2 group-hover:rotate-12 transition-transform shadow-xl">
+                               <ImageIcon size={48} />
+                            </div>
+                            <div>
+                               <p className="text-2xl font-black text-slate-900 dark:text-white uppercase tracking-tighter">Visual Signal</p>
+                               <p className="text-[12px] text-slate-400 font-bold uppercase tracking-widest mt-2">Max payload: 50MB</p>
+                            </div>
+                            <input type="file" className="hidden" accept="image/*,video/*" onChange={handleImageChange} />
+                            <div className="mt-4 px-10 py-4 bg-indigo-500 hover:bg-indigo-600 text-white rounded-2xl text-[11px] font-black shadow-2xl shadow-indigo-500/30 transition-all uppercase tracking-[0.2em]">Initiate Upload</div>
+                         </label>
+                      ) : (
+                         <div className="w-full h-full relative group">
+                            {selectedFile?.type?.startsWith('video/') ? (
+                               <video src={imagePreview} className="w-full h-full object-cover" controls autoPlay loop muted />
+                            ) : (
+                               <img src={imagePreview} className="w-full h-full object-cover" alt="" />
+                            )}
+                            <button onClick={() => {setImagePreview(null); setSelectedFile(null);}} className="absolute top-8 right-8 p-5 bg-black/60 text-white rounded-3xl hover:bg-black transition-all shadow-2xl backdrop-blur-xl border border-white/10"><X size={28} /></button>
+                         </div>
+                      )}
+                   </div>
 
-     {/* Create Modal - Redesigned & Isolate from transforms */}
-     {showCreateModal && (
-       <div className="modal-backdrop px-4">
-          <div className="bg-white dark:bg-slate-900 w-full max-w-[600px] rounded-3xl shadow-3xl overflow-hidden border border-slate-200 dark:border-white/10 flex flex-col h-[700px] animate-fade-in">
-             <div className="p-5 border-b border-slate-200 dark:border-white/10 flex justify-between items-center">
-                <button onClick={() => setShowCreateModal(false)} className="w-10 h-10 flex items-center justify-center hover:bg-slate-100 dark:hover:bg-white/5 rounded-full transition-all"><X size={24} /></button>
-                <h3 className="text-[18px] font-bold text-slate-900 dark:text-white">New Campus Publication</h3>
-                <button 
-                  onClick={handleCreatePost}
-                  disabled={!postText.trim() && !imagePreview}
-                  className="premium-button text-[13px] uppercase tracking-widest py-2 px-6 disabled:opacity-30"
-                >
-                  Publish
-                </button>
-             </div>
-             
-             <div className="flex-1 flex flex-col overflow-y-auto no-scrollbar">
-                {/* Media Upload Area - Premium */}
-                <div className="w-full h-[400px] bg-slate-50 dark:bg-neutral-950 flex items-center justify-center relative border-b border-slate-200 dark:border-white/5">
-                   {!imagePreview ? (
-                      <label className="flex flex-col items-center gap-6 cursor-pointer hover:scale-105 transition-all p-10 text-center">
-                         <div className="w-20 h-20 bg-indigo-500/10 rounded-3xl flex items-center justify-center text-indigo-500 mb-2">
-                            <ImageIcon size={40} />
+                   {/* Post Details */}
+                   <div className="p-8 flex flex-col flex-1 bg-white dark:bg-[#0a0d17]">
+                      <div className="flex items-center gap-4 mb-8">
+                         <div className="w-12 h-12 rounded-2xl overflow-hidden shadow-2xl border-2 border-indigo-500/20">
+                            {user?.profilePic ? <img src={getMediaUrl(user.profilePic)} className="w-full h-full object-cover" alt="" /> : <div className="w-full h-full bg-indigo-500/10 flex items-center justify-center font-bold text-indigo-500 uppercase">{user?.firstName?.[0]}</div>}
                          </div>
                          <div>
-                            <p className="text-xl font-bold text-slate-900 dark:text-white">Visual Content</p>
-                            <p className="text-sm text-slate-500 mt-1 max-w-[240px]">Drop high-quality images or student life videos here</p>
+                            <p className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-tight">Syncing as {user?.firstName}</p>
+                            <p className="text-[11px] text-indigo-500 font-black uppercase tracking-widest">{user?.role || 'MEMBER'}</p>
                          </div>
-                         <input type="file" className="hidden" accept="image/*,video/*" onChange={handleImageChange} />
-                         <div className="mt-2 px-8 py-3 bg-indigo-500 hover:bg-indigo-600 text-white rounded-2xl text-sm font-bold shadow-xl shadow-indigo-500/20 transition-all uppercase tracking-widest">Browse Files</div>
-                      </label>
-                   ) : (
-                      <div className="w-full h-full relative">
-                         {selectedFile?.type?.startsWith('video/') ? (
-                            <video src={imagePreview} className="w-full h-full object-cover" controls autoPlay loop muted />
-                         ) : (
-                            <img src={imagePreview} className="w-full h-full object-cover" />
-                         )}
-                         <button onClick={() => {setImagePreview(null); setSelectedFile(null);}} className="absolute top-6 right-6 p-4 bg-black/60 text-white rounded-2xl hover:bg-black transition-all shadow-2xl backdrop-blur-md border border-white/10"><X size={24} /></button>
                       </div>
-                   )}
-                </div>
+                      
+                      <textarea 
+                        className="w-full flex-1 bg-transparent border-none text-xl outline-none text-slate-900 dark:text-white resize-none py-2 placeholder:text-slate-400 font-bold tracking-tight"
+                        placeholder="Define your campus signal..." 
+                        value={postText}
+                        onChange={e => setPostText(e.target.value)}
+                      />
 
-                {/* Post Details */}
-                <div className="p-6 flex flex-col flex-1">
-                   <div className="flex items-center gap-3 mb-6">
-                      <div className="w-10 h-10 rounded-xl overflow-hidden shadow-md">
-                         {user?.profilePic ? <img src={user.profilePic} className="w-full h-full object-cover" /> : <div className="w-full h-full bg-indigo-500/10 flex items-center justify-center font-bold text-indigo-500 uppercase">{user?.firstName?.[0]}</div>}
-                      </div>
-                      <div>
-                         <p className="text-sm font-bold text-slate-900 dark:text-white">Posting as {user?.firstName}</p>
-                         <p className="text-xs text-slate-400 font-medium">{user?.role || 'Campus User'}</p>
-                      </div>
-                   </div>
-                   
-                   <textarea 
-                     className="w-full flex-1 bg-transparent border-none text-[16px] outline-none text-slate-900 dark:text-white resize-none py-2 placeholder:text-slate-400 font-medium"
-                     placeholder="Share your thoughts, academic updates, or doubts with the community..." 
-                     value={postText}
-                     onChange={e => setPostText(e.target.value)}
-                   />
-
-                   {/* Category Chipset */}
-                   <div className="mt-8 flex flex-wrap gap-3 pt-6 border-t border-slate-200 dark:border-white/5">
-                       {['general', 'doubt'].map(type => (
-                          <button key={type} onClick={() => setPostType(type)} className={`px-6 py-2.5 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all ${postType === type ? 'accent-gradient-bg text-white shadow-lg shadow-indigo-500/20' : 'bg-slate-100 dark:bg-white/5 text-slate-500 hover:text-slate-900 dark:hover:text-white outline-1 outline-slate-200'}`}>{type}</button>
-                       ))}
-                       
-                       {/* Music Button */}
-                       <button 
-                         onClick={() => setShowMusicPicker(!showMusicPicker)}
-                         className={`px-6 py-2.5 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all ${selectedMusic ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/20' : 'bg-slate-100 dark:bg-white/5 text-slate-500 hover:text-slate-900 dark:hover:text-white outline-1 outline-slate-200'} flex items-center gap-2`}
-                       >
-                          <Activity size={14} /> {selectedMusic ? selectedMusic.title : 'Add Music'}
-                       </button>
-
-                       {(user?.role === 'faculty' || user?.role === 'admin') && ['announcement', 'notice'].map(type => (
-                          <button key={type} onClick={() => setPostType(type)} className={`px-6 py-2.5 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all ${postType === type ? 'bg-indigo-600 text-white shadow-lg' : 'bg-slate-100 dark:bg-white/5 text-slate-500 hover:text-slate-900 dark:hover:text-white outline-1 outline-slate-200'}`}>{type}</button>
-                       ))}
-                   </div>
-
-                   {/* Music Picker Dropdown */}
-                   {showMusicPicker && (
-                     <div className="mt-4 p-4 bg-slate-50 dark:bg-white/5 rounded-2xl border border-slate-200 dark:border-white/5 space-y-2 animate-scale-in">
-                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2 px-2">Select Track</p>
-                        {mockMusic.map(m => (
+                      {/* Category Chipset */}
+                      <div className="mt-10 flex flex-wrap gap-4 pt-8 border-t border-slate-100 dark:border-white/5">
+                          {['general', 'doubt'].map(type => (
+                             <button key={type} onClick={() => setPostType(type)} className={`px-8 py-3 rounded-2xl text-[11px] font-black uppercase tracking-[0.2em] transition-all shadow-md ${postType === type ? 'accent-gradient-bg text-white shadow-indigo-500/30' : 'bg-slate-100 dark:bg-white/5 text-slate-500 hover:bg-slate-200 dark:hover:bg-white/10'}`}>{type}</button>
+                          ))}
+                          
                           <button 
-                            key={m.id} 
-                            onClick={() => { setSelectedMusic(m); setShowMusicPicker(false); }}
-                            className="w-full text-left p-3 hover:bg-white dark:hover:bg-white/5 rounded-xl flex items-center justify-between group transition-all"
+                            onClick={() => setShowMusicPicker(!showMusicPicker)}
+                            className={`px-8 py-3 rounded-2xl text-[11px] font-black uppercase tracking-[0.2em] transition-all shadow-md ${selectedMusic ? 'bg-emerald-500 text-white' : 'bg-slate-100 dark:bg-white/5 text-slate-500'} flex items-center gap-2`}
                           >
-                             <div>
-                                <p className="text-sm font-bold text-slate-900 dark:text-white">{m.title}</p>
-                                <p className="text-[11px] text-slate-500">{m.artist}</p>
-                             </div>
-                             <div className="p-2 bg-indigo-500/10 text-indigo-500 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity">
-                                <Plus size={14} />
-                             </div>
+                             <Activity size={16} /> {selectedMusic ? selectedMusic.title : 'Audio Feed'}
                           </button>
-                        ))}
-                     </div>
-                   )}
-                 </div>
+                      </div>
+                   </div>
+                </div>
              </div>
           </div>
-       </div>
-     )}
+        )}
+     </div>
     </>
   );
 };
 
-export default Dashboard;
+export default Dashboard;rd;
