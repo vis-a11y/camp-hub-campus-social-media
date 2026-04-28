@@ -14,6 +14,11 @@ const Sidebar = () => {
   const { user, logout } = useAuth();
   const [showMore, setShowMore] = useState(false);
 
+  const pathname = location.pathname.toLowerCase();
+  const isAuthPage = pathname.includes('login') || pathname.includes('register');
+
+  if (isAuthPage) return null;
+
   const menuItems = [
     { icon: Home,          label: 'Feed',          path: '/dashboard' },
     { icon: Compass,       label: 'Discovery',     path: '/explore' },

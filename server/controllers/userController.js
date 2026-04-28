@@ -98,6 +98,7 @@ const getFollowing = async (req, res) => {
 // Discover people
 const discoverPeople = async (req, res) => {
   try {
+    const { branch, search } = req.query;
     const currentId = req.user ? req.user._id : null;
     let filter = currentId ? { _id: { $ne: currentId } } : {};
     
