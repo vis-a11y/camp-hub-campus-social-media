@@ -58,20 +58,18 @@ function AppRoutes() {
   const { user, loading } = useAuth();
   const location = useLocation();
   
-  // 1. Normalize pathname to handle trailing slashes and casing
-  const pathname = location.pathname.toLowerCase();
+  // Use location.pathname as primary, window.location.pathname as secondary fallback
+  const currentPath = (location.pathname || window.location.pathname || '').toLowerCase();
   
-  // 2. Extremely defensive Auth Page check
-  // Check for exact matches or paths starting with /login or /register
-  const isAuthPage = pathname === '/login' || 
-                     pathname === '/login/' || 
-                     pathname === '/register' || 
-                     pathname === '/register/' ||
-                     pathname.startsWith('/login?') ||
-                     pathname.startsWith('/register?');
+  // 2. Extremely broad Auth Page check - hide on login, register, or the root landing
+  const isAuthPage = currentPath.includes('login') || 
+                     currentPath.includes('register') || 
+                     currentPath === '/' || 
+                     currentPath === '';
 
   if (loading) return null;
 
+  // Final confirmation: show navigation ONLY if we have a user AND we are NOT on an auth/root page
   const showNavigation = !!user && !isAuthPage;
 
   return (

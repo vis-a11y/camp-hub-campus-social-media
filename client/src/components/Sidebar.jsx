@@ -14,10 +14,10 @@ const Sidebar = () => {
   const { user, logout } = useAuth();
   const [showMore, setShowMore] = useState(false);
 
-  const pathname = location.pathname.toLowerCase();
-  const isAuthPage = pathname.includes('login') || pathname.includes('register');
+  const currentPath = (location.pathname || window.location.pathname || '').toLowerCase();
+  const isAuthPage = currentPath.includes('login') || currentPath.includes('register');
 
-  if (isAuthPage) return null;
+  if (isAuthPage || !user) return null;
 
   const menuItems = [
     { icon: Home,          label: 'Feed',          path: '/dashboard' },
