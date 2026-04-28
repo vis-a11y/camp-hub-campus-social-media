@@ -116,26 +116,39 @@ app.post('/api/upload', upload.single('file'), (req, res) => {
 
 const mongoURI = process.env.MONGODB_URI;
 
-// Better validation for the connection string
+// Robust MongoDB Connection Logic
+if (!mongoURI && process.env.NODE_ENV === 'production') {
+  console.error('❌ CRITICAL ERROR: MONGODB_URI is not defined in environment variables!');
+  console.error('💡 ACTION REQUIRED: Add MONGODB_URI (your Atlas string) to your deployment platform settings.');
+  // In production, we should ideally not fall back to localhost if we expect persistence
+}
+
 const finalMongoURI = (mongoURI && mongoURI.startsWith('mongodb')) 
   ? mongoURI 
   : 'mongodb://localhost:27017/campchat';
 
 if (mongoURI && !mongoURI.startsWith('mongodb')) {
-  console.warn(`⚠️ Warning: MONGODB_URI ("${mongoURI}") is invalid. Falling back to local MongoDB.`);
+  console.warn(`⚠️ Warning: MONGODB_URI is invalid. Falling back to local MongoDB.`);
 }
 
 console.log('📡 Attempting to connect to MongoDB...');
+if (finalMongoURI.includes('localhost')) {
+  console.warn('⚠️ USING LOCAL DATABASE: Data will NOT persist on cloud platforms (Render/Vercel).');
+}
 
-mongoose.connect(finalMongoURI)
-  .then(() => console.log('✅ Connected to MongoDB'))
+mongoose.connect(finalMongoURI, {
+  serverSelectionTimeoutMS: 5000, // Timeout after 5s instead of hanging
+})
+  .then(() => {
+    console.log('✅ Connected to MongoDB Successfully');
+    console.log(`📂 Database Host: ${mongoose.connection.host}`);
+  })
   .catch((err) => {
     console.error('❌ MongoDB Connection Error:', err.message);
-    if (finalMongoURI.includes('localhost')) {
-      console.error('💡 TIP: Ensure your LOCAL MongoDB service is running (mongod).');
-    } else {
-      console.error('💡 TIP: Check your MONGODB_URI credentials and whitelist your IP in Atlas.');
-    }
+    console.error('💡 TROUBLESHOOTING:');
+    console.error('   1. Check if MONGODB_URI is correct in your .env or dashboard.');
+    console.error('   2. Ensure your IP address is whitelisted in MongoDB Atlas.');
+    console.error('   3. If running locally, make sure MongoDB service is active.');
   });
 
 // Routes
