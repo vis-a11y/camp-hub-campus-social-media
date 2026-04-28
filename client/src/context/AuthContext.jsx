@@ -4,6 +4,9 @@ import { useNavigate } from 'react-router-dom';
 
 const AuthContext = createContext();
 
+// Configure API base URL for production support
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
+
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -13,7 +16,7 @@ export const AuthProvider = ({ children }) => {
     const verifySession = async (token) => {
       try {
         axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-        const { data } = await axios.get('/api/auth/me');
+        const { data } = await axios.get(`${API_BASE_URL}/auth/me`);
         setUser(data);
         localStorage.setItem('campchat_user', JSON.stringify(data));
       } catch (err) {
@@ -40,7 +43,7 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const login = async (email, password) => {
-    const { data } = await axios.post('/api/auth/login', { email, password });
+    const { data } = await axios.post(`${API_BASE_URL}/auth/login`, { email, password });
     setUser(data);
     localStorage.setItem('campchat_user', JSON.stringify(data));
     axios.defaults.headers.common['Authorization'] = `Bearer ${data.token}`;
@@ -49,7 +52,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   const register = async (userData) => {
-    const { data } = await axios.post('/api/auth/register', userData);
+    const { data } = await axios.post(`${API_BASE_URL}/auth/register`, userData);
     setUser(data);
     localStorage.setItem('campchat_user', JSON.stringify(data));
     axios.defaults.headers.common['Authorization'] = `Bearer ${data.token}`;
