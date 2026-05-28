@@ -1,0 +1,311 @@
+/* ---- STORIES BAR ---- */
+.stories-container {
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  padding: 16px 0;
+  margin-bottom: 10px;
+  scrollbar-width: none;
+}
+.stories-container::-webkit-scrollbar { display: none; }
+
+.story-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  min-width: 66px;
+  flex-shrink: 0;
+}
+
+.story-ring {
+  width: 68px;
+  height: 68px;
+  border-radius: 50%;
+  padding: 2.5px;
+  background: var(--story-ring);
+  position: relative;
+  transition: transform 0.15s ease;
+}
+.story-ring:hover { transform: scale(1.05); }
+.story-ring.viewed { background: var(--border-color); }
+
+.current-user-no-story {
+  background: transparent;
+  border: 2px dashed var(--border-color);
+  padding: 2px;
+}
+
+.story-avatar {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2.5px solid var(--bg-color);
+  background-color: var(--bg-color);
+  display: block;
+}
+
+.add-story-btn {
+  position: absolute;
+  bottom: -1px;
+  right: -1px;
+  background-color: var(--accent-color);
+  color: white;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2.5px solid var(--bg-color);
+}
+
+.story-username {
+  font-size: 11px;
+  color: var(--text-color);
+  max-width: 72px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  text-align: center;
+}
+
+/* ---- STORY VIEWER ---- */
+.story-viewer-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.story-viewer-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  position: absolute;
+  inset: 0;
+}
+
+.story-progress-bars {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  right: 12px;
+  display: flex;
+  gap: 4px;
+  z-index: 10;
+}
+
+.story-progress-track {
+  flex: 1;
+  height: 2.5px;
+  background: rgba(255,255,255,0.35);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.story-progress-fill {
+  height: 100%;
+  background: white;
+  transition: width 50ms linear;
+  border-radius: 2px;
+}
+
+.story-viewer-header {
+  position: absolute;
+  top: 26px;
+  left: 12px;
+  right: 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  z-index: 10;
+}
+
+.story-viewer-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid white;
+  flex-shrink: 0;
+}
+
+.story-viewer-username {
+  color: white;
+  font-weight: 700;
+  font-size: 14px;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+}
+
+.story-viewer-time {
+  color: rgba(255,255,255,0.75);
+  font-size: 11px;
+}
+
+.story-close-btn {
+  margin-left: auto;
+  color: white;
+  opacity: 0.85;
+  display: flex;
+  align-items: center;
+}
+.story-close-btn:hover { opacity: 1; }
+
+.story-viewers-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: white;
+  font-size: 13px;
+  font-weight: 600;
+  background: rgba(255,255,255,0.15);
+  padding: 4px 10px;
+  border-radius: 20px;
+}
+
+.story-tap-zone {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 35%;
+  display: flex;
+  align-items: center;
+  z-index: 9;
+  color: white;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.story-tap-zone:hover { opacity: 0.6; }
+
+.story-tap-left { left: 0; justify-content: flex-start; padding-left: 8px; }
+.story-tap-right { right: 0; justify-content: flex-end; padding-right: 8px; }
+
+.story-caption {
+  position: absolute;
+  bottom: 80px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  color: white;
+  font-size: 16px;
+  font-weight: 600;
+  padding: 8px 20px;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.7);
+  z-index: 10;
+}
+
+.story-viewers-panel {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(0,0,0,0.75);
+  padding: 20px;
+  z-index: 11;
+  border-radius: 20px 20px 0 0;
+  color: white;
+}
+.story-viewers-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 700;
+  font-size: 15px;
+  margin-bottom: 10px;
+}
+
+/* ---- UPLOAD MODAL ---- */
+.story-upload-modal {
+  background: var(--card-bg);
+  border-radius: 16px;
+  width: 100%;
+  max-width: 420px;
+  overflow: hidden;
+}
+
+.story-upload-form {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.story-upload-preview {
+  width: 100%;
+  aspect-ratio: 9/16;
+  max-height: 340px;
+  background: var(--bg-color);
+  border: 2px dashed var(--border-color);
+  border-radius: 12px;
+  overflow: hidden;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.2s;
+}
+.story-upload-preview:hover { border-color: var(--accent-color); }
+.story-upload-preview img { width: 100%; height: 100%; object-fit: cover; }
+
+.story-upload-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  color: var(--secondary-text);
+  font-size: 14px;
+}
+
+.story-caption-input {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  background: var(--bg-color);
+  color: var(--text-color);
+  font-size: 14px;
+  font-family: inherit;
+}
+.story-caption-input:focus { outline: none; border-color: var(--accent-color); }
+
+/* ---- SHARED MODAL STYLES ---- */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 500;
+  padding: 20px;
+}
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border-color);
+}
+.modal-header h3 { font-size: 16px; font-weight: 700; }
+.icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-color);
+  border-radius: 50%;
+  width: 34px;
+  height: 34px;
+  transition: background 0.2s;
+}
+.icon-btn:hover { background: var(--card-bg); }
+
+@media (max-width: 768px) {
+  .story-viewer-overlay { padding: 0; }
+  .story-viewer-image { object-fit: cover; }
+}

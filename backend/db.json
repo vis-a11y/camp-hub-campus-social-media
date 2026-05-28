@@ -1,0 +1,24 @@
+{
+  "users": [
+    {
+      "id": "1779995266149",
+      "username": "user",
+      "fullName": "Vishal prajapati",
+      "password": "password123",
+      "role": "student",
+      "avatar": "https://ui-avatars.com/api/?name=Vishal%20prajapati&background=random"
+    },
+    {
+      "id": "1779995330288",
+      "username": "user2",
+      "fullName": "test",
+      "password": "password123",
+      "role": "faculty",
+      "avatar": "https://ui-avatars.com/api/?name=test&background=random"
+    }
+  ],
+  "stories": [],
+  "posts": [],
+  "messages": [],
+  "events": []
+}
